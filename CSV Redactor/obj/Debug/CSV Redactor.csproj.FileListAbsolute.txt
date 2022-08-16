@@ -1,0 +1,22 @@
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\bin\Debug\CSV Redactor.exe.config
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\bin\Debug\CSV Redactor.exe
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\bin\Debug\CSV Redactor.pdb
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.AssemblyReference.cache
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.SuggestedBindingRedirects.cache
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV_Redactor.Form1.resources
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV_Redactor.Properties.Resources.resources
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.GenerateResource.cache
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.CoreCompileInputs.cache
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.exe
+C:\Users\green\Desktop\Проекты\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.pdb
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\bin\Debug\CSV Redactor.exe.config
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\bin\Debug\CSV Redactor.exe
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\bin\Debug\CSV Redactor.pdb
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.AssemblyReference.cache
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.SuggestedBindingRedirects.cache
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV_Redactor.Properties.Resources.resources
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.GenerateResource.cache
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.csproj.CoreCompileInputs.cache
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.exe
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV Redactor.pdb
+C:\Users\green\Desktop\Проекты\C#\CSV Redactor\CSV Redactor\obj\Debug\CSV_Redactor.Main_Form.resources
