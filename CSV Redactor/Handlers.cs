@@ -131,43 +131,6 @@ namespace CSV_Redactor
         {
             try
             {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                RichTextBox textBox = tabInfo.TextBox;
-
-                int selStart = textBox.SelectionStart;
-                if (selStart == 0) return;
-
-                // Покраска символа разделителя
-                if (textBox.ForeColor == tabInfo.SeparatorColor)
-                {
-                    textBox.Select(selStart - 1, 1);
-                    textBox.SelectionColor = textBox.ForeColor;
-                    textBox.Select(selStart, 0);
-                    textBox.SelectionColor = textBox.ForeColor;
-                    return;
-                }
-
-                if (textBox.Text[selStart - 1] == tabInfo.Separator)
-                {
-                    textBox.Select(selStart - 1, 1);
-                    textBox.SelectionColor = tabInfo.SeparatorColor;
-                    textBox.Select(selStart, 0);
-                    textBox.SelectionColor = textBox.ForeColor;
-                }
-                if (tabInfo.RowCount != textBox.Lines.Length)
-                {
-                    SetStatusBarInfoLabel(tabInfo);
-                }
-
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-        }
-        public static void TextBox_LostFocus(object sender, EventArgs e)
-        {
-            Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
 
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
@@ -1087,8 +1050,6 @@ namespace CSV_Redactor
                 hideEmptyRows.Checked = false;
                 hideEmptyRows.Enabled = tabInfo.IsShowAsTable;
                 tabInfo.IsHideEmptyRows = hideEmptyRows.Checked;
-
-                Debug.WriteLine($"{tabInfo.IsStretchCells}");
 
                 if (tabInfo.IsShowAsTable)
                 {

@@ -117,7 +117,6 @@ namespace CSV_Redactor
                               new XElement("defaultColumnCount", 1),
                               new XElement("defaultSeparator", ';'),
                               new XElement("supportedSeparators", ";,."),
-                              new XElement("separatorColor", "#FF0000"),
                               new XElement("showAsTable", true),
                               new XElement("stretchCells", true),
                               new XElement("hideEmptyRows", false)

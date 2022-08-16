@@ -116,7 +116,6 @@ namespace CSV_Redactor
             public bool IsDataBase { get; set; }
             public bool IsFileOpened { get; set; }
             public char Separator { get; set; }
-            public System.Drawing.Color SeparatorColor { get; set; }
             public List<object> Data { get; set; }
             public DataGridView DataGridView { get; private set; }
             public RichTextBox TextBox { get; private set; }
@@ -164,7 +163,6 @@ namespace CSV_Redactor
             /// <summary>
             /// Конструктор класса TabInfo
             /// </summary>
-            /// <param name="tabName">Имя вкладки</param>
             /// <param name="dataGridView">Ссылка на DataGridView</param>
             /// <param name="textBox">Ссылка на RichTextBox</param>
             public TabInfo(string fullTabName, string shortTabName, string extension, DataGridView dataGridView = null, RichTextBox textBox = null)
@@ -187,7 +185,6 @@ namespace CSV_Redactor
                     RowCount = 0;
                     IsFixed = false;
                     Separator = Convert.ToChar(localCsvSettings.Element("defaultSeparator").Value);
-                    SeparatorColor = System.Drawing.ColorTranslator.FromHtml(localCsvSettings.Element("separatorColor").Value);
                     Data = new List<object>();
 
                     DataGridView = dataGridView;
@@ -220,7 +217,6 @@ namespace CSV_Redactor
                     IsDataBase = tabInfo.IsDataBase;
                     IsFileOpened = tabInfo.IsFileOpened;
                     Separator = tabInfo.Separator;
-                    SeparatorColor = tabInfo.SeparatorColor;
                     Data = tabInfo.Data;
                     DataGridView = dataGridView;
                     TextBox = textBox;
@@ -280,7 +276,6 @@ namespace CSV_Redactor
                         BackColor = System.Drawing.SystemColors.Control,
                         Font = new System.Drawing.Font("Lucida Console", 11)
                     };
-                    textBox.LostFocus += Handlers.TextBox_LostFocus;
                     textBox.TextChanged += Handlers.TextBox_TextChanged;
 
                     newPage.Controls.Add(textBox);
