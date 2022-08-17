@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using static CSV_Redactor.Main_Form;
@@ -21,7 +20,7 @@ namespace CSV_Redactor
         public static string[] GenColumnNames(string[] rawNames)
         {
             string[] names = new string[rawNames.Length];
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { rawNames});
+            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { rawNames });
             try
             {
                 for (int i = 0; i < rawNames.Length; i++)
@@ -59,7 +58,7 @@ namespace CSV_Redactor
         public static string CreateUniqueName(string oldName)
         {
             string name = "";
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { oldName});
+            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { oldName });
             try
             {
                 name = $"{oldName}_{DateTime.Now}";
@@ -86,7 +85,7 @@ namespace CSV_Redactor
         public static XDocument LoadSettingsFile(string baseDirectory)
         {
             XDocument doc;
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] {baseDirectory});
+            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { baseDirectory });
             try
             {
                 doc = XDocument.Load(
@@ -215,18 +214,17 @@ namespace CSV_Redactor
                 using (StringReader reader = new(textBox.Text))
                 {
                     string line;
+                    char separator = tabInfo.Separator;
                     while ((line = reader.ReadLine()) != null)
                     {
                         Lines.Add(line.Trim());
-                        int separatorCount = 0;
-                        foreach (char symbol in line.Trim())
-                            if (symbol == tabInfo.Separator)
-                                separatorCount++;
+
+                        int separatorCount = line.Split(separator).Length - 1;
+
                         if (separatorCount > maxSeparatorCount)
                             maxSeparatorCount = separatorCount;
                     }
                 }
-
 
                 int rowCount = 0,
                     columnCount = 0;
@@ -238,7 +236,6 @@ namespace CSV_Redactor
                     if (splittedLine.Count() - 1 != maxSeparatorCount)
                     {
                         separatorsNeedToAdd = maxSeparatorCount - (splittedLine.Count() - 1);
-
                     }
                     if (rowCount == 0)
                     {
@@ -266,19 +263,18 @@ namespace CSV_Redactor
 
                 columnCount = maxSeparatorCount + 1;
                 // Удаление пустых строк в конце
+                bool isBreak = false;
                 for (int i = rowCount - 1; i > -1; i--)
                 {
-                    string row = "";
                     for (int j = 0; j < columnCount; j++)
                     {
-                        row += data[i * columnCount + j];
+                        string cell = "" + data[i * columnCount + j];
+                        if (cell.Trim() == "") continue;
+                        else { isBreak = true; break; }
                     }
-                    if (row.Replace(" ", "") == "")
-                    {
-                        data.RemoveRange(i * columnCount, columnCount);
-                        rowCount--;
-                    }
-                    else break;
+                    if (isBreak) break;
+                    data.RemoveRange(i * columnCount, columnCount);
+                    rowCount--;
                 }
 
                 tabInfo.ColumnCount = columnCount;
@@ -301,7 +297,7 @@ namespace CSV_Redactor
         public static List<object> ReadData(DataGridView dataGridView, int columnCount)
         {
             List<object> data = new();
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] {columnCount});
+            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { columnCount });
             try
             {
                 TabInfo tabInfo = TabInfo.TabsInfo.Find(tab => tab.FullTabName == TabInfo.Files_TabControl.SelectedTab.Name);
@@ -396,7 +392,7 @@ namespace CSV_Redactor
                 for (int i = 0; i < columnCount; i++)
                     list.Add(formattedData[i]);
                 list.Add(formattedData.Length);
-                TraceCalls(MethodBase.GetCurrentMethod(), new object[] { rowCount, columnCount, list, tabInfo});
+                TraceCalls(MethodBase.GetCurrentMethod(), new object[] { rowCount, columnCount, list, tabInfo });
 
                 // Определение отступов
                 int[] maxLengths = new int[columnCount];
@@ -614,8 +610,8 @@ namespace CSV_Redactor
                 {
                     dynamic[] arrayContent = type.Contains("String[]") ? (string[])variables[i] : (object[])variables[i];
                     string arrayText = string.Join(", ", arrayContent);
-                    variablesText += $"[{( arrayText == "" ? "Empty" : arrayText)}]";
-                } 
+                    variablesText += $"[{(arrayText == "" ? "Empty" : arrayText)}]";
+                }
                 else if (type.Contains("List"))
                 {
                     variablesText += $"[{string.Join(", ", (List<object>)variables[i])}]";
@@ -626,15 +622,15 @@ namespace CSV_Redactor
                 }
 
                 if (i < variables.Length - 1)
-                    variablesText += ", ";                
+                    variablesText += ", ";
             }
             string message = $"{DateTime.Now:yyyy.MM.dd HH:mm:ss.fff} {method.Name}\n" +
                 $"{method}\n";
-                
-            if(variablesText.Replace(" ","")!="")
-                message+= $"{variablesText}\n";
 
-            if(IsTraceCallsEnabled)
+            if (variablesText.Replace(" ", "") != "")
+                message += $"{variablesText}\n";
+
+            if (IsTraceCallsEnabled)
                 Debug.WriteLine(message);
 
             TraceErrorListenerText += $"{message}\n";
@@ -654,7 +650,7 @@ namespace CSV_Redactor
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
                 }
-                    
+
             else
                 foreach (DataGridViewColumn column in dataGridView.Columns)
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
