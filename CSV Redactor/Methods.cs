@@ -12,6 +12,10 @@ namespace CSV_Redactor
 {
     internal class Methods
     {
+        //TEST
+
+
+
         /// <summary>
         /// Преобразование имен в уникальные
         /// </summary>
