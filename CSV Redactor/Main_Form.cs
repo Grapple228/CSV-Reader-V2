@@ -542,7 +542,7 @@ namespace CSV_Redactor
 
                         QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
                         QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                        QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Enabled = tabInfo.IsShowAsTable;
+                        QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Visible = tabInfo.IsShowAsTable;
                         ToolStripMenuItem hideEmptyRows = (ToolStripMenuItem)itemsInView["hideEmptyRows"];
                         hideEmptyRows.Checked = false;
                         hideEmptyRows.Enabled = tabInfo.IsShowAsTable;
@@ -691,7 +691,8 @@ namespace CSV_Redactor
                 decreaseColumnCount_Button.Click += Handlers.DecreaseButton_Click;
 
                 // TEXTBOX
-                columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged;
+                //columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged;
+                columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged2;
 
                 // TAB CONTROL
                 Files_TabControl.SelectedIndexChanged += Handlers.TabControl_SelectedIndexChanged;

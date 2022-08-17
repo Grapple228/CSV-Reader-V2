@@ -69,6 +69,7 @@ namespace CSV_Redactor
         /// <summary>
         /// Открытие настроек программы
         /// </summary>
+        /// </summary>
         public static void ShowSettingsDialog()
         {
             TraceCalls(MethodBase.GetCurrentMethod());
@@ -269,7 +270,7 @@ namespace CSV_Redactor
                     for (int j = 0; j < columnCount; j++)
                     {
                         string cell = "" + data[i * columnCount + j];
-                        if (cell.Trim() == "") continue;
+                        if (cell.Trim().Replace(" ", "").Replace("\u00A0", "") == "") continue;
                         else { isBreak = true; break; }
                     }
                     if (isBreak) break;
@@ -322,19 +323,18 @@ namespace CSV_Redactor
                 }
 
                 // Удаление пустых строк в конце
-                for (int i = rowCount; i > -1; i--)
+                bool isBreak = false;
+                for (int i = rowCount - 1; i > -1; i--)
                 {
-                    string row = "";
                     for (int j = 0; j < columnCount; j++)
                     {
-                        row += data[i * columnCount + j];
+                        string cell = "" + data[i * columnCount + j];
+                        if (cell.Trim().Replace(" ","").Replace("\u00A0", "") == "") continue;
+                        else { isBreak = true; break; }
                     }
-                    if (row.Replace(" ", "") == "")
-                    {
-                        data.RemoveRange(i * columnCount, columnCount);
-                        rowCount--;
-                    }
-                    else break;
+                    if (isBreak) break;
+                    data.RemoveRange(i * columnCount, columnCount);
+                    rowCount--;
                 }
 
                 tabInfo.ColumnCount = dataGridView.ColumnCount;
@@ -520,20 +520,18 @@ namespace CSV_Redactor
                         }
 
                         // Удаление пустых строк в конце
+                        bool isBreak = false;
                         for (int i = rowCount - 1; i > -1; i--)
                         {
-                            if (dataGridView.Rows[i].IsNewRow) continue;
-                            string row = "";
                             for (int j = 0; j < columnCount; j++)
                             {
-                                row += dataGridView[j, i].Value;
+                                string cell = "" + dataGridView[j, i].Value;
+                                if (cell.Trim() == "") continue;
+                                else { isBreak = true; break; }
                             }
-                            if (row.Replace(" ", "").Replace("\u00A0", "") == "")
-                            {
-                                rowCount--;
-                                dataGridView.Rows.RemoveAt(i);
-                            }
-                            else break;
+                            if (isBreak) break;
+                            dataGridView.Rows.RemoveAt(i);
+                            rowCount--;
                         }
                     }
                     catch (Exception ex) { ExceptionProcessing(ex); }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -131,7 +130,9 @@ namespace CSV_Redactor
         {
             try
             {
-
+                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
+                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -1035,15 +1036,14 @@ namespace CSV_Redactor
                 if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
                 TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
 
-                tabInfo.Data = tabInfo.IsShowAsTable ?
-                    Methods.ReadData(tabInfo.DataGridView, tabInfo.ColumnCount) :
-                    Methods.ReadData(tabInfo.TextBox);
+                QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
+                QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
+                QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Visible = !tabInfo.IsShowAsTable;
+
+                if (!tabInfo.IsShowAsTable)
+                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox);
 
                 tabInfo.IsShowAsTable = (sender as ToolStripMenuItem).Checked;
-
-                QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Enabled = tabInfo.IsShowAsTable;
 
                 ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
                 ToolStripMenuItem hideEmptyRows = (ToolStripMenuItem)itemsInView["hideEmptyRows"];
@@ -1083,7 +1083,8 @@ namespace CSV_Redactor
                 {
                     tabInfo.Data = Methods.ReadData(tabInfo.TextBox);
                     Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
-                } else Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
+                }
+                else Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -1130,9 +1131,119 @@ namespace CSV_Redactor
         #endregion
 
         #region TextBox
+        public static void ColumnCountBox_TextChanged2(object sender, EventArgs e)
+        {
+            Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
+            try
+            {
+                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                DataGridView dataGridView = tabInfo.DataGridView;
+
+                if (!int.TryParse(ColumnCount_TextBox.Text, out int newColumnCount) || newColumnCount <= 0)
+                {
+                    if (ColumnCount_TextBox.Text.Replace(" ", "") == "") return;
+
+                    ColumnCount_TextBox.Text = tabInfo.ColumnCount.ToString();
+                    return;
+                }
+
+                if (!tabInfo.IsShowAsTable) return;
+
+                if (newColumnCount == tabInfo.ColumnCount)
+                {
+                    SetStatusBarInfoLabel(tabInfo);
+                    return;
+                }
+
+
+                // Обработка заголовков таблицы
+                int differense = Math.Abs(tabInfo.ColumnCount - newColumnCount);
+
+                tabInfo.DataGridView.ColumnCount = newColumnCount;
+                if (newColumnCount > tabInfo.ColumnCount)
+                {
+                    // ГЕНЕРАЦИЯ ИМЕН
+                    string[] names = new string[tabInfo.DataGridView.ColumnCount];
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        names[i] = dataGridView.Columns[i].HeaderText;
+                    }
+                    names = Methods.GenColumnNames(names);
+                    // ДОБАВЛЕНИЕ ИМЕН
+                    for (int i = 0; i < tabInfo.DataGridView.ColumnCount; i++)
+                    {
+                        if (i < tabInfo.DataGridView.ColumnCount - differense)
+                            tabInfo.Data[i] = names[i];
+                        else
+                            tabInfo.Data.Insert(i, names[i]);
+                    }
+                }
+                else // newColumnCount < tabInfo.ColumnCount
+                {
+                    int columnNumber = tabInfo.ColumnCount - differense;
+
+                    for (int i = 0; i < differense; i++)
+                    {
+                        tabInfo.Data.RemoveAt(columnNumber);
+                    }
+                }
+
+                // Добавление пустых значений в последнюю строку данных
+                int dataNeedToAdd = tabInfo.DataGridView.ColumnCount - tabInfo.Data.Count % tabInfo.DataGridView.ColumnCount;
+                for (int i = 0; i < dataNeedToAdd; i++)
+                    tabInfo.Data.Add(null);
+
+                tabInfo.ColumnCount = tabInfo.DataGridView.ColumnCount;
+
+                if (tabInfo.Data.Count - tabInfo.ColumnCount != 0)
+                {
+                    // Удаление пустых строк в конце данных
+                    bool isBreak = false;
+                    int count = tabInfo.Data.Count - tabInfo.ColumnCount;
+                    int rowCount = count / tabInfo.ColumnCount;
+                    if (count % tabInfo.ColumnCount != 0) rowCount++;
+
+                    for (int i = rowCount; i > -1; i--)
+                    {
+                        int maxValue = count % tabInfo.ColumnCount == 0 ?
+                            tabInfo.ColumnCount :
+                            tabInfo.ColumnCount - count % tabInfo.ColumnCount;
+
+                        for (int j = 0; j < maxValue; j++)
+                        {
+                            string cell = "" + tabInfo.Data[i * tabInfo.ColumnCount + j];
+                            if (cell.Trim().Replace(" ", "").Replace("\u00A0", "") == "") continue;
+                            else { isBreak = true; break; }
+                        }
+                        if (isBreak) break;
+
+                        tabInfo.Data.RemoveRange(i * tabInfo.ColumnCount, maxValue);
+                    }
+                }
+
+
+                // Обработка поведения таблицы в зависимости от состояния фиксации
+                if (tabInfo.IsFixed) // Если зафиксировано
+                {
+
+                }
+                else // Если не зафиксировано
+                {
+                    tabInfo.FixedColumnCount = tabInfo.ColumnCount;
+                    ColumnCount_TextBox.Text = tabInfo.ColumnCount.ToString();
+                    Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
+                }
+
+                foreach (DataGridViewColumn column in dataGridView.Columns)
+                {
+                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                }
+            }
+            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+        }
         public static void ColumnCountBox_TextChanged(object sender, EventArgs e)
         {
-            Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] {sender});
+            Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
             try
             {
                 TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
@@ -1151,9 +1262,6 @@ namespace CSV_Redactor
                     SetStatusBarInfoLabel(tabInfo);
                     return;
                 }
-
-                if (tabInfo.IsShowAsTable) tabInfo.Data = Methods.ReadData(tabInfo.DataGridView, tabInfo.ColumnCount);
-                else tabInfo.Data = Methods.ReadData(tabInfo.TextBox);
 
                 // Обработка заголовков таблицы
                 int differense = intResult > tabInfo.ColumnCount ?
@@ -1218,7 +1326,7 @@ namespace CSV_Redactor
 
                 foreach (DataGridViewColumn column in dataGridView.Columns)
                 {
-                    column.SortMode = DataGridViewColumnSortMode.NotSortable; column.AutoSizeMode = tabInfo.IsStretchCells ? DataGridViewAutoSizeColumnMode.DisplayedCells : DataGridViewAutoSizeColumnMode.None;
+                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
                 }
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
