@@ -1,0 +1,124 @@
+2022.08.17 16:16:47.893 FillActionsBar
+Void FillActionsBar()
+
+2022.08.17 16:16:47.908 AddEventHandlersToFormComponents
+Void AddEventHandlersToFormComponents()
+
+2022.08.17 16:16:47.908 AddImageListToTabs
+Void AddImageListToTabs()
+
+2022.08.17 16:16:47.912 Выполнен запуск программы
+
+2022.08.17 16:16:49.240 OpenFile_Click
+Void OpenFile_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:16:49.971 CreateFile_Click
+Void CreateFile_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:16:49.971 <CreateFile_Click>g__ShowCreationNewFileWindow|33_0
+System.Windows.Forms.DialogResult <CreateFile_Click>g__ShowCreationNewFileWindow|33_0(System.String ByRef)
+
+2022.08.17 16:16:50.517 CreateContextMenuOnRowClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnRowClick()
+
+2022.08.17 16:16:50.520 CreateContextMenuOnNewRowClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnNewRowClick()
+
+2022.08.17 16:16:50.521 CreateContextMenuOnHeaderClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnHeaderClick()
+
+2022.08.17 16:16:50.524 CreateContextMenuOnTabClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnTabClick()
+
+2022.08.17 16:16:50.525 CreateNewTabPage
+System.Windows.Forms.TabPage CreateNewTabPage(System.String)
+123123.csv
+
+2022.08.17 16:16:50.526 CreateUniqueName
+System.String CreateUniqueName(System.String)
+123123.csv
+
+2022.08.17 16:16:50.529 ChangeProgramMenuAvailability
+Void ChangeProgramMenuAvailability(Boolean)
+True
+
+2022.08.17 16:16:50.530 ChangeProgramMenuAvailability
+Void ChangeProgramMenuAvailability(Boolean, TabInfo)
+True, CSV_Redactor.Main_Form+TabInfo
+
+2022.08.17 16:16:50.531 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[Empty]
+
+2022.08.17 16:16:50.536 ColumnCountBox_TextChanged
+Void ColumnCountBox_TextChanged(System.Object, System.EventArgs)
+1
+
+2022.08.17 16:16:50.540 ChangeFormElementsVisibility
+Void ChangeFormElementsVisibility(Boolean)
+True
+
+2022.08.17 16:16:50.546 ChangeProgramMenuAvailability
+Void ChangeProgramMenuAvailability(Boolean, TabInfo)
+True, CSV_Redactor.Main_Form+TabInfo
+
+2022.08.17 16:16:50.548 WriteData
+Void WriteData(System.Windows.Forms.DataGridView, System.Collections.Generic.List`1[System.Object], Int32)
+[Column, 1], 1
+
+2022.08.17 16:16:50.551 <WriteData>g__AddWithEmptyRows|13_1
+Void <WriteData>g__AddWithEmptyRows|13_1(<>c__DisplayClass13_0 ByRef, <>c__DisplayClass13_1 ByRef)
+
+2022.08.17 16:16:50.552 ChangeStretchDataGridView
+Void ChangeStretchDataGridView(System.Windows.Forms.DataGridView, Boolean)
+True
+
+2022.08.17 16:16:50.936 ShowAsTable_Click
+Void ShowAsTable_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:16:50.938 WriteData
+Void WriteData(System.Windows.Forms.RichTextBox, System.Collections.Generic.List`1[System.Object], Int32)
+[Column, 1], 1
+
+2022.08.17 16:16:50.939 <WriteData>g__AddRows|12_0
+System.String <WriteData>g__AddRows|12_0(Int32, Int32, System.Object[], TabInfo)
+1, 1, [Column, 1], CSV_Redactor.Main_Form+TabInfo
+
+2022.08.17 16:16:50.946 ChangeStretchDataGridView
+Void ChangeStretchDataGridView(System.Windows.Forms.DataGridView, Boolean)
+True
+
+2022.08.17 16:17:09.239 ShowAsTable_Click
+Void ShowAsTable_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:17:09.241 ReadData
+System.Collections.Generic.List`1[System.Object] ReadData(System.Windows.Forms.RichTextBox)
+
+2022.08.17 16:17:09.261 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[L3fSLVLl5RDeKArWQhtN, pWiiDYvJvcmZL0XRalNR, g2QvbtpMSaNe2upvsXEW, b6aAmbo9EKB8dAeAETcj, 50ByrLlE9ZDBeaq5PJRB]
+
+2022.08.17 16:17:09.271 ColumnCountBox_TextChanged
+Void ColumnCountBox_TextChanged(System.Object, System.EventArgs)
+5
+
+Первый 151
+2022.08.17 16:17:09.395 ReadData1
+System.Collections.Generic.List`1[System.Object] ReadData1(System.Windows.Forms.RichTextBox)
+
+2022.08.17 16:17:09.437 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[L3fSLVLl5RDeKArWQhtN, pWiiDYvJvcmZL0XRalNR, g2QvbtpMSaNe2upvsXEW, b6aAmbo9EKB8dAeAETcj, 50ByrLlE9ZDBeaq5PJRB]
+
+Первый (улучшенный) 109
+2022.08.17 16:17:09.503 ReadData2
+System.Collections.Generic.List`1[System.Object] ReadData2(System.Windows.Forms.RichTextBox)
+
+2022.08.17 16:17:09.568 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[L3fSLVLl5RDeKArWQhtN,  pWiiDYvJvcmZL0XRalNR,  g2QvbtpMSaNe2upvsXEW,  b6aAmbo9EKB8dAeAETcj,  50ByrLlE9ZDBeaq5PJRB]
+
+Второй 150
+2022.08.17 16:18:02.597 Form_FormClosing
+Void Form_FormClosing(System.Object, System.Windows.Forms.FormClosingEventArgs)
+

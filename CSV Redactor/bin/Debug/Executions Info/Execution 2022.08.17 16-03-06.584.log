@@ -1,0 +1,113 @@
+2022.08.17 16:03:06.624 FillActionsBar
+Void FillActionsBar()
+
+2022.08.17 16:03:06.639 AddEventHandlersToFormComponents
+Void AddEventHandlersToFormComponents()
+
+2022.08.17 16:03:06.640 AddImageListToTabs
+Void AddImageListToTabs()
+
+2022.08.17 16:03:06.644 Выполнен запуск программы
+
+2022.08.17 16:03:13.800 CreateFile_Click
+Void CreateFile_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:03:13.801 <CreateFile_Click>g__ShowCreationNewFileWindow|33_0
+System.Windows.Forms.DialogResult <CreateFile_Click>g__ShowCreationNewFileWindow|33_0(System.String ByRef)
+
+2022.08.17 16:03:14.917 CreateContextMenuOnRowClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnRowClick()
+
+2022.08.17 16:03:14.920 CreateContextMenuOnNewRowClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnNewRowClick()
+
+2022.08.17 16:03:14.921 CreateContextMenuOnHeaderClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnHeaderClick()
+
+2022.08.17 16:03:14.924 CreateContextMenuOnTabClick
+System.Windows.Forms.ContextMenuStrip CreateContextMenuOnTabClick()
+
+2022.08.17 16:03:14.926 CreateNewTabPage
+System.Windows.Forms.TabPage CreateNewTabPage(System.String)
+33213.csv
+
+2022.08.17 16:03:14.926 CreateUniqueName
+System.String CreateUniqueName(System.String)
+33213.csv
+
+2022.08.17 16:03:14.929 ChangeProgramMenuAvailability
+Void ChangeProgramMenuAvailability(Boolean)
+True
+
+2022.08.17 16:03:14.931 ChangeProgramMenuAvailability
+Void ChangeProgramMenuAvailability(Boolean, TabInfo)
+True, CSV_Redactor.Main_Form+TabInfo
+
+2022.08.17 16:03:14.932 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[Empty]
+
+2022.08.17 16:03:14.937 ColumnCountBox_TextChanged
+Void ColumnCountBox_TextChanged(System.Object, System.EventArgs)
+1
+
+2022.08.17 16:03:14.939 ChangeFormElementsVisibility
+Void ChangeFormElementsVisibility(Boolean)
+True
+
+2022.08.17 16:03:14.944 ChangeProgramMenuAvailability
+Void ChangeProgramMenuAvailability(Boolean, TabInfo)
+True, CSV_Redactor.Main_Form+TabInfo
+
+2022.08.17 16:03:14.945 WriteData
+Void WriteData(System.Windows.Forms.DataGridView, System.Collections.Generic.List`1[System.Object], Int32)
+[Column, 1], 1
+
+2022.08.17 16:03:14.946 <WriteData>g__AddWithEmptyRows|13_1
+Void <WriteData>g__AddWithEmptyRows|13_1(<>c__DisplayClass13_0 ByRef, <>c__DisplayClass13_1 ByRef)
+
+2022.08.17 16:03:14.947 ChangeStretchDataGridView
+Void ChangeStretchDataGridView(System.Windows.Forms.DataGridView, Boolean)
+True
+
+2022.08.17 16:03:15.463 ShowAsTable_Click
+Void ShowAsTable_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:03:15.465 WriteData
+Void WriteData(System.Windows.Forms.RichTextBox, System.Collections.Generic.List`1[System.Object], Int32)
+[Column, 1], 1
+
+2022.08.17 16:03:15.466 <WriteData>g__AddRows|12_0
+System.String <WriteData>g__AddRows|12_0(Int32, Int32, System.Object[], TabInfo)
+1, 1, [Column, 1], CSV_Redactor.Main_Form+TabInfo
+
+2022.08.17 16:03:15.474 ChangeStretchDataGridView
+Void ChangeStretchDataGridView(System.Windows.Forms.DataGridView, Boolean)
+True
+
+2022.08.17 16:03:20.975 ShowAsTable_Click
+Void ShowAsTable_Click(System.Object, System.EventArgs)
+
+2022.08.17 16:03:20.981 ReadData
+System.Collections.Generic.List`1[System.Object] ReadData(System.Windows.Forms.RichTextBox)
+
+2022.08.17 16:03:21.067 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[L3fSLVLl5RDeKArWQhtN, pWiiDYvJvcmZL0XRalNR, g2QvbtpMSaNe2upvsXEW, b6aAmbo9EKB8dAeAETcj, 50ByrLlE9ZDBeaq5PJRB]
+
+2022.08.17 16:03:21.100 ColumnCountBox_TextChanged
+Void ColumnCountBox_TextChanged(System.Object, System.EventArgs)
+5
+
+Первый 255
+2022.08.17 16:03:21.234 ReadData1
+System.Collections.Generic.List`1[System.Object] ReadData1(System.Windows.Forms.RichTextBox)
+
+2022.08.17 16:03:21.256 GenColumnNames
+System.String[] GenColumnNames(System.String[])
+[L3fSLVLl5RDeKArWQhtN, pWiiDYvJvcmZL0XRalNR, g2QvbtpMSaNe2upvsXEW, b6aAmbo9EKB8dAeAETcj, 50ByrLlE9ZDBeaq5PJRB]
+
+Первый (улучшенный) 68
+2022.08.17 16:03:21.323 ReadData2
+System.Collections.Generic.List`1[System.Object] ReadData2(System.Windows.Forms.RichTextBox)
+

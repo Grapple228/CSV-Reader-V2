@@ -14,7 +14,6 @@
       <defaultColumnCount>1</defaultColumnCount>
       <defaultSeparator>;</defaultSeparator>
       <supportedSeparators>;,.</supportedSeparators>
-      <separatorColor>#FF0000</separatorColor>
       <showAsTable>true</showAsTable>
       <stretchCells>true</stretchCells>
       <hideEmptyRows>false</hideEmptyRows>
