@@ -20,14 +20,15 @@ namespace CSV_Redactor
         public readonly static bool IsTraceCallsEnabled;
         public static TextWriterTraceListener TraceListener;
         public static string TraceErrorListenerText = "";
+        public static bool IsShowStatusBar;
 
         static Main_Form()
         {
             BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             SettingsFile = Methods.LoadSettingsFile(BaseDirectory);
             IsTraceCallsEnabled = Convert.ToBoolean(Methods.GetFieldsFromSettings(SettingsFile, "global-IsTracingEnabled").Value);
-            
-            if(IsTraceCallsEnabled)
+            IsShowStatusBar = Convert.ToBoolean(Methods.GetFieldsFromSettings(SettingsFile, "global-IsShowStatusBar").Value);
+            if (IsTraceCallsEnabled)
                 FillTraceListener();
             
             static void FillTraceListener()
@@ -58,7 +59,7 @@ namespace CSV_Redactor
                 MinimumSize = new(width, height);
 
                 FillActionsBar();
-                if (!Convert.ToBoolean(Methods.GetFieldsFromSettings(SettingsFile, "global-showStatusBar").Value))
+                if (!IsShowStatusBar)
                 {
                     Files_TabControl.Height += 25;
                     StatusBar.Visible = false;
@@ -88,9 +89,7 @@ namespace CSV_Redactor
             public static ToolStrip StatusBar_ToolStrip { get; }
             #endregion
 
-
             // Остальные поля
-            public static bool IsShowStatusBar { get; set; }
             public static List<TabInfo> TabsInfo { get; }
             public static Button CloseTabButton { get; }
             public static int ClickedTabNumber { get; set; }
@@ -105,6 +104,7 @@ namespace CSV_Redactor
             public string FullTabName { get; private set; }
             public string ShortTabName { get; private set; }
             public string Extension { get; private set; }
+            public string FilePath { get; set; }
             public int ColumnCount { get; set; }
             public int FixedColumnCount { get; set; }
             public int RowCount { get; set; }
@@ -113,8 +113,8 @@ namespace CSV_Redactor
             public bool IsShowAsTable { get; set; }
             public bool IsStretchCells { get; set; }
             public bool IsFixed { get; set; }
-            public bool IsDataBase { get; set; }
             public bool IsFileOpened { get; set; }
+            public bool IsDataBase { get; set; }
             public char Separator { get; set; }
             public List<object> Data { get; set; }
             public DataGridView DataGridView { get; private set; }
@@ -138,7 +138,6 @@ namespace CSV_Redactor
                     ProgramMenu_MenuStrip = (MenuStrip)MainForm_Form.Controls["ProgramActionsBar"];
                     QickActionsMenu_ToolStrip = (ToolStrip)MainForm_Form.Controls["ActionButtons_ToolStrip"];
                     ColumnCount_TextBox = (ToolStripTextBox)QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"];
-                    IsShowStatusBar = Convert.ToBoolean(Methods.GetFieldsFromSettings(SettingsFile, "global-showStatusBar").Value);
 
                     TabsInfo = new List<TabInfo>();
                     CloseTabButton = new Button();
@@ -516,10 +515,10 @@ namespace CSV_Redactor
                 {
                     switch (tabInfo.Extension)
                     {
-                        case "csv": csv(); return;
+                        case ".csv": TextFile(); return;
                     }
 
-                    void csv()
+                    async void TextFile()
                     {
                         ToolStripItemCollection itemsInFile = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["file"]).DropDown.Items;
                         ((ToolStripMenuItem)itemsInFile["createFile"]).Enabled = true;
@@ -530,8 +529,9 @@ namespace CSV_Redactor
                         ToolStripItemCollection itemsInDataBase = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["dataBase"]).DropDown.Items;
                         // database items
                         ToolStripItemCollection itemsInEdit = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["edit"]).DropDown.Items;
-                        ((ToolStripMenuItem)itemsInEdit["refresh"]).Enabled = availability;
+                        ((ToolStripMenuItem)itemsInEdit["refresh"]).Enabled = tabInfo.IsFileOpened;
                         ((ToolStripMenuItem)itemsInEdit["clear"]).Enabled = availability;
+
                         ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
                         ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Enabled = true;
                         ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Checked = tabInfo.IsHideEmptyRows;
@@ -624,7 +624,10 @@ namespace CSV_Redactor
                 {
                     ContextMenuStrip dataBaseContextMenu = new();
 
-                    // 
+                    ToolStripMenuItem openDB = new("Открыть") { Name = "openDB", Checked = false, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.Shift | Keys.O };
+                    openDB.Click += Handlers.OpenDataBase_Click;
+
+                    dataBaseContextMenu.Items.AddRange(new[] { openDB });
 
                     dataBase.DropDown = dataBaseContextMenu;
                     ((ContextMenuStrip)dataBase.DropDown).ShowImageMargin = false;
@@ -651,9 +654,8 @@ namespace CSV_Redactor
                 {
                     ContextMenuStrip viewContextMenu = new();
 
-                    ToolStripMenuItem showStatusBar = new("Отображение строки состояния") { Name = "showStatusBar", Checked = StatusBar.Visible, CheckOnClick = true, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.I };
+                    ToolStripMenuItem showStatusBar = new("Отображение строки состояния") { Name = "showStatusBar", Checked = IsShowStatusBar, CheckOnClick = true, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.I };
                     showStatusBar.Click += Handlers.ShowStatusBar_Click;
-
                     ToolStripMenuItem hideEmptyRows = new("Сокрытие пустых строк") { Name = "hideEmptyRows", Checked = false, CheckOnClick = true, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.H };
                     hideEmptyRows.Click += Handlers.HideEmptyRows_Click;
                     ToolStripMenuItem showAsTable = new("Отображение в виде таблицы") { Name = "showAsTable", Checked = false, CheckOnClick = true, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.T };
@@ -692,7 +694,7 @@ namespace CSV_Redactor
 
                 // TEXTBOX
                 //columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged;
-                columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged2;
+                columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged;
 
                 // TAB CONTROL
                 Files_TabControl.SelectedIndexChanged += Handlers.TabControl_SelectedIndexChanged;

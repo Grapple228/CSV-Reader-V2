@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using static CSV_Redactor.Main_Form;
 using static CSV_Redactor.Main_Form.TabInfo;
@@ -873,7 +875,7 @@ namespace CSV_Redactor
 
                 if (newFileName.Replace(" ", "") == "") newFileName = Methods.GetFieldsFromSettings(SettingsFile, "global-defaultFileName").Value;
                 string extension = Methods.GetFieldsFromSettings(SettingsFile, "global-defaultFileExtension").Value;
-                newFileName = newFileName.Trim() + "." + extension;
+                newFileName = newFileName.Trim() + extension;
                 TabPage newTabPage = CreateNewTabPage(newFileName);
 
                 newTabPage.ImageIndex = 0;
@@ -902,14 +904,12 @@ namespace CSV_Redactor
                 Files_TabControl.SelectedIndex = Files_TabControl.TabCount - 1;
                 ColumnCount_TextBox.Text = dataGridView.ColumnCount.ToString();
 
+                if (tabInfo.IsShowAsTable) { Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount); Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells); }
+                else { Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount); tabInfo.IsStretchCells = false; }
+
                 ChangeFormElementsVisibility(true);
                 ChangeProgramMenuAvailability(true, tabInfo);
                 SetStatusBarInfoLabel(tabInfo);
-
-                if (tabInfo.IsShowAsTable) Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
-                else Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
-
-                Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
             static DialogResult ShowCreationNewFileWindow(ref string inputText)
@@ -950,7 +950,60 @@ namespace CSV_Redactor
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Title = "Открытие текстового файла",
+                    Filter =
+                    "Text files|*.csv;*.txt|" + // TEXT FILES
+                    "All files|*.*" // ALL FILES
+                };
+                DialogResult result = openFileDialog.ShowDialog();
+                if (result != DialogResult.OK) return;
+                string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
+                switch (extension)
+                {
+                    case ".txt":
+                    case ".csv": TextFileOpened(); return;
+                    default: { MessageBox.Show($"Файл с расширением \"{extension}\" не поддерживается!", "Внимание!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return; }
+                }
+                void TextFileOpened()
+                {
+                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
 
+                    string fileName = openFileDialog.SafeFileName;
+                    TabPage newTabPage = CreateNewTabPage(fileName);
+
+                    newTabPage.ImageIndex = 0;
+
+                    DataGridView dataGridView = newTabPage.Controls.OfType<DataGridView>().First();
+                    RichTextBox textBox = newTabPage.Controls.OfType<RichTextBox>().First();
+
+                    TabInfo tabInfo = new(
+                    fullTabName: newTabPage.Name,
+                    shortTabName: fileName,
+                    extension: extension,
+                    dataGridView: dataGridView,
+                    textBox: textBox
+                    );
+                    tabInfo.IsFileOpened = true;
+                    tabInfo.FilePath = openFileDialog.FileName;
+                    TabsInfo.Add(tabInfo);
+
+                    Files_TabControl.TabPages.Add(newTabPage);
+                    Files_TabControl.SelectedIndex = Files_TabControl.TabCount - 1;
+
+                    if (tabInfo.IsShowAsTable)
+                    {
+                        tabInfo.Data = Methods.ReadData(File.ReadAllText(openFileDialog.FileName, Encoding.Default));
+                        Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
+                        Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
+                    }
+                    else { tabInfo.TextBox.Text = File.ReadAllText(openFileDialog.FileName, Encoding.Default); tabInfo.IsStretchCells = false; }
+
+                    ChangeFormElementsVisibility(true);
+                    ChangeProgramMenuAvailability(true, tabInfo);
+                    SetStatusBarInfoLabel(tabInfo);
+                }
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -975,7 +1028,50 @@ namespace CSV_Redactor
         #endregion
 
         #region DataBase Program Menu
-        // Add
+        public static void OpenDataBase_Click(object sender, EventArgs e)
+        {
+            Methods.TraceCalls(MethodBase.GetCurrentMethod());
+            try
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Title = "Открытие базы данных",
+                    Filter =
+                    "SQL Server|*.mdf|" +
+                    "SQLite|*.sqlite;*.sqlite3;*.db;*.db3;*.s3db;*.sl3|" +
+                    "MySQL|*.myd|" +
+                    "All files|*.*"
+                };
+                DialogResult result = openFileDialog.ShowDialog();
+                if (result != DialogResult.OK) return;
+                string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
+                switch (extension)
+                {
+                    case ".mdf": SQLServerOpened(); return;
+                    case ".sqlite":
+                    case ".sqlite3":
+                    case ".db":
+                    case ".db3":
+                    case ".s3db":
+                    case ".sl3": SQLiteOpened(); return;
+                    case ".myd": MySQLOpened(); return;
+                    default: { MessageBox.Show($"База данных с расширением \"{extension}\" не поддерживается!", "Внимание!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return; }
+                }
+                void SQLServerOpened()
+                {
+                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
+                }
+                void SQLiteOpened()
+                {
+                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
+                }
+                void MySQLOpened()
+                {
+                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
+                }
+            }
+            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+        }
         #endregion
 
         #region Edit Program Menu
@@ -984,7 +1080,37 @@ namespace CSV_Redactor
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
+                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
+                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
 
+                if (!File.Exists(tabInfo.FilePath))
+                { 
+                    MessageBox.Show("Не удалось выполнить считывание!\nФайл не доступен или не существует!", "Возникла ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+                    return; 
+                }
+
+                if (tabInfo.IsDataBase)
+                {
+                    // Обновить список таблиц
+                    // Если таблица пропала из списка таблиц, то спросить, закрыть ли таблицу или оставить текущую копию 
+                    // Иначе обновить таблицу
+                }
+                else
+                {
+                    if (tabInfo.IsShowAsTable)
+                    {
+                        tabInfo.Data = Methods.ReadData(File.ReadAllText(tabInfo.FilePath, Encoding.Default));
+                        Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
+                        Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
+                    }
+                    else 
+                    { 
+                        tabInfo.TextBox.Text = File.ReadAllText(tabInfo.FilePath, Encoding.Default); 
+                        tabInfo.IsStretchCells = false;
+                        ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
+                        ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = false;
+                    }
+                }
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -993,7 +1119,25 @@ namespace CSV_Redactor
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
+                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
+                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
 
+                if (tabInfo.IsDataBase)
+                {
+                    // Очистить содержимое выбранной таблицы
+                }
+                else
+                {
+                    if (tabInfo.IsShowAsTable)
+                    {
+                        tabInfo.DataGridView.Rows.Clear();
+                        Methods.ChangeStretchDataGridView(tabInfo.DataGridView, false);
+                    }
+                    else 
+                    { 
+                        tabInfo.TextBox.Text = tabInfo.TextBox.Lines[0]; 
+                    }
+                }
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -1041,7 +1185,7 @@ namespace CSV_Redactor
                 QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Visible = !tabInfo.IsShowAsTable;
 
                 if (!tabInfo.IsShowAsTable)
-                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox);
+                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox.Text);
 
                 tabInfo.IsShowAsTable = (sender as ToolStripMenuItem).Checked;
 
@@ -1081,7 +1225,7 @@ namespace CSV_Redactor
 
                 if (!tabInfo.IsShowAsTable)
                 {
-                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox);
+                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox.Text);
                     Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
                 }
                 else Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
@@ -1131,7 +1275,7 @@ namespace CSV_Redactor
         #endregion
 
         #region TextBox
-        public static void ColumnCountBox_TextChanged2(object sender, EventArgs e)
+        public static void ColumnCountBox_TextChanged(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
             try
@@ -1241,96 +1385,6 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void ColumnCountBox_TextChanged(object sender, EventArgs e)
-        {
-            Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
-            try
-            {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                DataGridView dataGridView = tabInfo.DataGridView;
-
-                if (!int.TryParse(ColumnCount_TextBox.Text, out int intResult) || intResult <= 0)
-                {
-                    if (ColumnCount_TextBox.Text.Replace(" ", "") == "") return;
-
-                    ColumnCount_TextBox.Text = tabInfo.ColumnCount.ToString();
-                    return;
-                }
-
-                if (intResult == tabInfo.ColumnCount)
-                {
-                    SetStatusBarInfoLabel(tabInfo);
-                    return;
-                }
-
-                // Обработка заголовков таблицы
-                int differense = intResult > tabInfo.ColumnCount ?
-                    intResult - tabInfo.ColumnCount :
-                    tabInfo.ColumnCount - intResult;
-
-                tabInfo.DataGridView.ColumnCount = intResult;
-                int columnNumber;
-
-                if (intResult > tabInfo.ColumnCount) // Добавление столбцов
-                {
-                    string[] names = new string[dataGridView.Columns.Count];
-                    for (int i = 0; i < names.Length; i++)
-                    {
-                        names[i] = dataGridView.Columns[i].HeaderText;
-                    }
-                    names = Methods.GenColumnNames(names);
-                    for (int i = 0; i < dataGridView.Columns.Count; i++)
-                    {
-                        dataGridView.Columns[i].HeaderText = names[i];
-                        // Изменить значения
-                        if (i < tabInfo.DataGridView.ColumnCount - differense)
-                        {
-                            tabInfo.Data[i] = names[i];
-                        }
-                        else
-                        {
-                            tabInfo.Data.Insert(i, names[i]);
-                        }
-                    }
-
-                    // Добавление пустых значений в последнюю строку данных
-                    int dataNeedToAdd = tabInfo.DataGridView.ColumnCount - tabInfo.Data.Count % tabInfo.DataGridView.ColumnCount;
-                    for (int i = 0; i < dataNeedToAdd; i++)
-                        tabInfo.Data.Add(null);
-
-                }
-                else if (intResult < tabInfo.ColumnCount) // Удаление столбца
-                {
-                    columnNumber = tabInfo.ColumnCount - differense;
-
-                    for (int i = 0; i < differense; i++)
-                    {
-                        tabInfo.Data.RemoveAt(columnNumber);
-                    }
-                }
-
-                tabInfo.ColumnCount = tabInfo.DataGridView.ColumnCount;
-
-                // Обработка поведения таблицы в зависимости от состояния фиксации
-                if (tabInfo.IsFixed) // Если зафиксировано
-                {
-
-                }
-                else // Если не зафиксировано
-                {
-                    tabInfo.FixedColumnCount = tabInfo.ColumnCount;
-                    ColumnCount_TextBox.Text = tabInfo.ColumnCount.ToString();
-                    if (tabInfo.IsShowAsTable) Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
-                    else Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
-                }
-
-                foreach (DataGridViewColumn column in dataGridView.Columns)
-                {
-                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
-                }
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-        }
         #endregion
 
         #region TabControl
@@ -1347,6 +1401,10 @@ namespace CSV_Redactor
                 ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Checked = tabInfo.IsHideEmptyRows;
                 ((ToolStripMenuItem)itemsInView["showAsTable"]).Checked = tabInfo.IsShowAsTable;
                 ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = tabInfo.IsStretchCells;
+
+                ToolStripItemCollection itemsInEdit = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["edit"]).DropDown.Items;
+                ((ToolStripMenuItem)itemsInEdit["refresh"]).Enabled = tabInfo.IsFileOpened;
+                ((ToolStripMenuItem)itemsInEdit["clear"]).Enabled = true;
 
                 QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
                 QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;

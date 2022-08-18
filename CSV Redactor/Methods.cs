@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using static CSV_Redactor.Main_Form;
 
 namespace CSV_Redactor
@@ -103,11 +104,12 @@ namespace CSV_Redactor
                 XDocument doc = new(
                     new XElement("settings",
                         new XElement("global",
-                                new XElement("IsTracingEnabled", true),
+                                new XElement("IsTracingEnabled", false),
                                 new XElement("defaultFileName", "New File"),
+                                new XElement("defaultTableName", "New Table"),
                                 new XElement("defaultColumnName", "Column"),
-                                new XElement("showStatusBar", false),
-                                new XElement("defaultFileExtension", "csv"),
+                                new XElement("showStatusBar", true),
+                                new XElement("defaultFileExtension", ".csv"),
                                 new XElement("minimumWindowWidth", 800),
                                 new XElement("minimumWindowHeight", 600)
                             ),
@@ -200,7 +202,7 @@ namespace CSV_Redactor
         /// </summary>
         /// <param name="textBox">Ссылка на экземпляр RichTextBox</param>
         /// <returns>Считанные данные</returns>
-        public static List<object> ReadData(RichTextBox textBox)
+        public static List<object> ReadData(string text)
         {
             List<object> data = new();
             TraceCalls(MethodBase.GetCurrentMethod());
@@ -212,7 +214,7 @@ namespace CSV_Redactor
 
                 int maxSeparatorCount = 0;
 
-                using (StringReader reader = new(textBox.Text))
+                using (StringReader reader = new(text))
                 {
                     string line;
                     char separator = tabInfo.Separator;
