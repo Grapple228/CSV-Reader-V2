@@ -13,6 +13,7 @@ using System.Xml.Linq;
 using CSV_Redactor.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using static CSV_Redactor.Main_Form;
+using CSV_Redactor.TabInfoFolder.Classes;
 
 namespace CSV_Redactor
 {
@@ -156,22 +157,23 @@ namespace CSV_Redactor
         /// </summary>
         /// <param name="textBox">Ссылка на экземпляр RichTextBox</param>
         /// <returns>Считанные данные</returns>
-        public static List<object> ReadData(string text)
+        public static List<string> ReadData(TextFile textFile)
         {
-            List<object> data = new();
+            List<string> data = new();
             TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                OldTabInfo tabInfo = OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.Files_TabControl.SelectedTab.Name);
+                //OldTabInfo tabInfo = OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.Files_TabControl.SelectedTab.Name);
 
                 List<string> Lines = new();
 
                 int maxSeparatorCount = 0;
 
-                using (StringReader reader = new(text))
+                //using (StringReader reader = new(text))
+                using (StringReader reader = new(textFile.TextBox.Text))
                 {
                     string line;
-                    char separator = tabInfo.Separator;
+                    char separator = textFile.Separator;
                     while ((line = reader.ReadLine()) != null)
                     {
                         Lines.Add(line.Trim());
@@ -187,7 +189,7 @@ namespace CSV_Redactor
                     columnCount = 0;
                 foreach (string line in Lines)
                 {
-                    string[] splittedLine = line.Split(tabInfo.Separator, '\n');
+                    string[] splittedLine = line.Split(textFile.Separator, '\n');
                     int separatorsNeedToAdd = 0;
 
                     if (splittedLine.Count() - 1 != maxSeparatorCount)
@@ -205,7 +207,7 @@ namespace CSV_Redactor
                         for (int i = 0; i < splittedLine.Length; i++)
                             splittedLine[i] = splittedLine[i].Trim();
 
-                        //data.AddRange(GenColumnNames(splittedLine));
+                        data.AddRange(Tab.GenColumnNames(splittedLine));
                         rowCount++;
                         continue;
                     }
@@ -234,11 +236,11 @@ namespace CSV_Redactor
                     rowCount--;
                 }
 
-                tabInfo.ColumnCount = columnCount;
+                textFile.ColumnCount = columnCount;
                 OldTabInfo.ColumnCount_TextBox.Text = columnCount.ToString();
-                tabInfo.DataGridView.ColumnCount = tabInfo.ColumnCount;
+                textFile.DataGridView.ColumnCount = textFile.ColumnCount;
 
-                tabInfo.RowCount = rowCount;
+                textFile.RowCount = rowCount;
                 //OldTabInfo.SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { ExceptionProcessing(ex); }

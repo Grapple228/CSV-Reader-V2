@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using CSV_Redactor.TabInfoFolder.Interfaces;
+using Extensions;
 
 namespace CSV_Redactor.TabInfoFolder.Classes
 {
@@ -42,7 +43,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         // IDefaultFieldsOfTabs
         public DataGridView DataGridView { get; protected set; }
         public RichTextBox TextBox { get; protected set; }
-        public List<string> Data { get; protected set; }
+        public List<string> Data { get; set; }
         public int ColumnCount { get; set; }
         public int FixedColumnCount { get; set; }
         public int RowCount { get; set; }
@@ -119,22 +120,34 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                 DataGridView.Rows.Clear();
             else TextBox.Text = TextBox.Lines[0];
         }
-        public void SaveAs()
+        public void SaveFileAs(string fileName = null)
         {
-
+            SaveFileDialog sfd = new()
+            {
+                AddExtension = true,
+                DefaultExt = Main_Form.Settings.DefaultFileExtension,
+                FileName = fileName == null ? Main_Form.Settings.DefaultFileName : fileName,
+                Filter = string.Join("|", new string[] { Tab.TextFilter, Tab.AllFilter }),
+                OverwritePrompt = true,
+                Title = "Выбор места сохранения файла"
+            };
+            if (sfd.ShowDialog() != DialogResult.OK) return;
+            string filePath = sfd.FileName;
+            WriteData(filePath);
         }
-
         public List<string> ReadData(string filePath = null)
         {
             List<string> data = new();
             if (filePath == null)
                 if (IsShowAsTable) ReadFromDataGridView();
-                else ReadText(
-                    ReadDataFromString(TextBox.Text));
+                else
+                {
+                    ReadText(ReadDataFromString(TextBox.Text));
+                }
             else
                 ReadText(
                     ReadDataFromString(
-                        File.ReadAllText(filePath, Encoding.Default)));
+                        File.ReadAllText(filePath, Encoding.UTF8)));
 
             return data;
 
@@ -190,7 +203,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                         splittedLine = headers.ToArray();
                         for (int i = 0; i < splittedLine.Length; i++)
                             splittedLine[i] = splittedLine[i].Trim();
-                        data.AddRange(Tab.GenColumnNames(headers.ToArray()));
+                        data.AddRange(Tab.GenColumnNames(splittedLine));
                         RowCount++;
                         continue;
                     }
@@ -240,135 +253,18 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         public void WriteData(string filePath = null)
         {
             if (filePath == null)
+            {
                 if (IsShowAsTable) WriteToDataGridView();
-                else TextBox.Text=WriteText();
+                else TextBox.Text = WriteText();
+                Tab.ColumnCount_TextBox.Text = ColumnCount.ToString();
+                Tab.SetStatusBarInfoLabel(this);
+            }
             else
             {
                 Data = ReadData();
-
-                File.WriteAllText(filePath, WriteText(), Encoding.Default);
+                File.WriteAllText(filePath, WriteText(), Encoding.UTF8);
             }
 
-            void WriteToDataGridView()
-            {
-                object[] formattedData = Data.ToArray();
-
-                List<object> list = new();
-                for (int i = 0; i < ColumnCount; i++)
-                    list.Add(formattedData[i]);
-                list.Add(formattedData.Length);
-                Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { list, ColumnCount });
-
-                int dataCount,
-                    rowCount,
-                    rowIndex,
-                    dataLeft,
-                    dataIndex;
-
-                DataGridView.Rows.Clear();
-                DataGridView.ColumnCount = ColumnCount;
-
-                dataCount = formattedData.Length - ColumnCount;
-
-                dataLeft = dataCount;
-
-                ColumnCount = IsFixed ? FixedColumnCount : ColumnCount;
-
-                if (dataCount % ColumnCount == 0)
-                    rowCount = dataCount / ColumnCount;
-                else
-                    rowCount = (dataCount / ColumnCount) + 1;
-                RowCount = rowCount;
-                dataIndex = 0 + ColumnCount;
-                rowIndex = 0;
-
-                for (int i = 0; i < ColumnCount; i++)
-                {
-                    DataGridView.Columns[i].HeaderText = Data[i].ToString();
-                }
-
-                int maxColumnNumber,
-                        tempIndex;
-
-                if (IsHideEmptyRows) AddWithoutEmptyRows();
-                else AddWithEmptyRows();
-                RowCount = rowCount;
-
-                //OldTabInfo.SetStatusBarInfoLabel(tabInfo);
-
-                void AddWithEmptyRows()
-                {
-                    for (int i = 0; i < rowCount; i++)
-                    {
-                        if (dataLeft > ColumnCount) { dataLeft -= ColumnCount; maxColumnNumber = ColumnCount; }
-                        else { maxColumnNumber = dataLeft; }
-
-                        AddRowToDataGridView();
-                    }
-
-                    // Удаление пустых строк в конце
-                    bool isBreak = false;
-                    for (int i = rowCount - 1; i > -1; i--)
-                    {
-                        for (int j = 0; j < ColumnCount; j++)
-                        {
-                            string cell = "" + DataGridView[j, i].Value;
-                            if (cell.Trim() == "") continue;
-                            else { isBreak = true; break; }
-                        }
-                        if (isBreak) break;
-                        DataGridView.Rows.RemoveAt(i);
-                        rowCount--;
-                    }
-                }
-                void AddWithoutEmptyRows()
-                {
-
-                    int removedRowCount = 0;
-                    for (int i = 0; i < rowCount; i++)
-                    {
-                        string nextRow = "";
-                        tempIndex = dataIndex;
-
-                        if (dataLeft > ColumnCount) { dataLeft -= ColumnCount; maxColumnNumber = ColumnCount; }
-                        else { maxColumnNumber = dataLeft; }
-
-                        for (int j = 0; j < maxColumnNumber; j++)
-                        {
-                            nextRow += formattedData[tempIndex];
-                            tempIndex++;
-                        }
-                        var value = nextRow.Trim().Replace(" ", "").Replace("\u00A0", "");
-
-                        // Запись в таблицу
-
-                        if (value != "")
-                        {
-                            AddRowToDataGridView();
-                        }
-                        else
-                        {
-                            dataIndex = tempIndex;
-                            removedRowCount++;
-                        }
-                    }
-                    rowCount -= removedRowCount;
-
-                }
-                void AddRowToDataGridView()
-                {
-
-                    DataGridView.Rows.Add();
-
-                    for (int j = 0; j < maxColumnNumber; j++)
-                    {
-                        DataGridView.Rows[rowIndex].Cells[j].Value = formattedData[dataIndex];
-                        dataIndex++;
-                    }
-                    rowIndex++;
-
-                }
-            }
             string WriteText()
             {
                 object[] formattedData = Data.ToArray();
@@ -454,6 +350,58 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                     }
                     return string.Join("\n", LinesArr);
                 }
+            }       
+            void WriteToDataGridView()
+            {
+                string[] formattedData = Data.ToArray();
+                List<object> list = new();
+                for (int i = 0; i < ColumnCount; i++)
+                    list.Add(formattedData[i]);
+                list.Add(formattedData.Length);
+                Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { list, ColumnCount });
+
+                string[][] arrays = Tab.TrimArray(formattedData, ColumnCount);
+
+                DataGridView.Rows.Clear();
+                DataGridView.ColumnCount = ColumnCount;
+                RowCount = arrays.Length;
+
+                for (int i = 0; i < ColumnCount; i++)
+                {
+                    DataGridView.Columns[i].HeaderText = arrays[0][i];
+                }
+
+                if (IsHideEmptyRows) AddWithoutEmptyRows();
+                else AddWithEmptyRows();
+
+                foreach (DataGridViewColumn column in DataGridView.Columns)
+                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
+
+                void AddWithEmptyRows()
+                {
+                    for (int i = 0; i < RowCount; i++)
+                    {
+                        DataGridView.Rows.Add(arrays[i]);
+                    }
+                }
+                void AddWithoutEmptyRows()
+                {
+                    int hiddenRows = 0;
+                    for (int i = 0; i < RowCount; i++)
+                    {
+                        bool isSkip = false;
+                        for(int j = 0; j<ColumnCount; j++)
+                        {
+                            string value = "" + arrays[i][j];
+                            if (value.Replace(" ", "").Replace("\u00A0", "") != "") break;
+                            isSkip = true;
+                        }
+                        if (isSkip) { hiddenRows++; continue; }
+
+                        DataGridView.Rows.Add(arrays[i]);
+                    }
+                    RowCount -= hiddenRows;
+                }
             }
         }
     }
@@ -466,7 +414,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             Data = ReadData(FilePath);
             WriteData();
         }
-        public void Save()
+        public void SaveFile()
         {
             Data = ReadData();
             WriteData(FilePath);
@@ -525,7 +473,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             else
             {
                 TextBox.Visible = true;
-                TextBox.Text = File.ReadAllText(FilePath, Encoding.Default);
+                LoadData();
                 RowCount = TextBox.Lines.Length;
             }
             Tab.Main_TabControl.TabPages.Add(TabPage);

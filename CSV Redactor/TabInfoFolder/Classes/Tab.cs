@@ -65,6 +65,17 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             Separators = Main_Form.Settings.SupportedSeparators;
         }
 
+        /// <summary>
+        /// Разбиение массива на подмассивы
+        /// </summary>
+        /// <param name="array">Разбиваемый массив</param>
+        /// <param name="size">Количесто элементов в подмассиве</param>
+        /// <returns>Массив с подмассивами</returns>
+        public static string[][] TrimArray(string[] array, int size)
+        {
+            int i = 0;
+            return array.GroupBy(s => i++ / size).Select(s => s.ToArray()).ToArray();
+        }
         public static string[] GenColumnNames(string[] rawNames)
         {
             string[] names = new string[rawNames.Length];
@@ -296,7 +307,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             ((ToolStripMenuItem)itemsInView["showAsTable"]).Enabled = true;
             ((ToolStripMenuItem)itemsInView["showAsTable"]).Checked = Instance.IsShowAsTable;
             ((ToolStripMenuItem)itemsInView["stretchCells"]).Enabled = true;
-            ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = Instance.IsStretchCells && Instance.IsShowAsTable;
+            ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = Instance.IsStretchCells;
 
             QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = Instance.IsShowAsTable;
             QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = Instance.IsShowAsTable;

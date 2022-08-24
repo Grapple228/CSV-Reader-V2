@@ -10,7 +10,7 @@ namespace CSV_Redactor.TabInfoFolder.Interfaces
     {
         abstract DataGridView DataGridView { get; }
         abstract RichTextBox TextBox { get; }
-        abstract List<string> Data { get; }
+        abstract List<string> Data { get; set; }
         abstract int ColumnCount { get; set; }
         abstract int FixedColumnCount { get; set; }
         abstract int RowCount { get; set; }
@@ -21,7 +21,7 @@ namespace CSV_Redactor.TabInfoFolder.Interfaces
         abstract bool IsStretchCells { get; set; }
         abstract bool IsFixed { get; set; }
         abstract void Clear();
-        abstract void SaveAs();
+        abstract void SaveFileAs(string fileName = null);
         abstract List<string> ReadData(string filePath = null);
         abstract void WriteData(string filePath = null);
     }

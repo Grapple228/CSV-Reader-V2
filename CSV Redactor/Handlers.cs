@@ -126,13 +126,9 @@ namespace CSV_Redactor
         #region Rich Text Box
         internal static void TextBox_TextChanged(object sender, EventArgs e)
         {
-            return;
-            try
-            {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            var tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+            if (tab != null)
+                Tab.SetStatusBarInfoLabel((IDefaultFieldsOfTabs)tab);
         }
         #endregion
 
@@ -146,14 +142,7 @@ namespace CSV_Redactor
                 tab.CreateNewTab();
             }
         }
-
         #endregion
-        #region TabControl
-
-        #endregion
-
-        #endregion
-
 
         #region Context Menu
 
@@ -879,14 +868,20 @@ namespace CSV_Redactor
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             IFile result = (IFile)Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
-            result.Save();
+            result.SaveFile();
             ((IDefaultFieldsOfTabs)result).IsChanged = false;
         }
         internal static void SaveFileAs_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
+            var tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+            
+            IDefaultFieldsOfTabs result = (IDefaultFieldsOfTabs)tab;
+            result.SaveFileAs(tab.PartialName);
         }
         #endregion
+        #endregion
+
 
         #region DataBase Program Menu
         internal static void OpenDataBase_Click(object sender, EventArgs e)
@@ -922,13 +917,12 @@ namespace CSV_Redactor
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                ITab tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+                IDefaultFieldsOfTabs tabInfo = (IDefaultFieldsOfTabs)tab;
 
                 tabInfo.IsHideEmptyRows = (sender as ToolStripMenuItem).Checked;
 
-                if (tabInfo.IsShowAsTable) Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
-                else Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
+                tabInfo.WriteData();
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -937,15 +931,15 @@ namespace CSV_Redactor
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                ITab tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+                IDefaultFieldsOfTabs tabInfo = (IDefaultFieldsOfTabs)tab;
 
                 QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
                 QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
                 QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Visible = !tabInfo.IsShowAsTable;
 
                 if (!tabInfo.IsShowAsTable)
-                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox.Text);
+                    tabInfo.Data = tabInfo.ReadData();
 
                 tabInfo.IsShowAsTable = (sender as ToolStripMenuItem).Checked;
 
@@ -954,22 +948,19 @@ namespace CSV_Redactor
                 hideEmptyRows.Checked = false;
                 hideEmptyRows.Enabled = tabInfo.IsShowAsTable;
                 tabInfo.IsHideEmptyRows = hideEmptyRows.Checked;
-
+                tabInfo.WriteData();
                 if (tabInfo.IsShowAsTable)
                 {
-                    Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
                     tabInfo.TextBox.Text = "";
+                    Tab.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
                 }
                 else
                 {
-                    Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
-                    tabInfo.DataGridView.Rows.Clear();
+                    tabInfo.DataGridView.Rows.Clear();             
                 }
 
                 tabInfo.DataGridView.Visible = tabInfo.IsShowAsTable;
                 tabInfo.TextBox.Visible = !tabInfo.IsShowAsTable;
-
-                //Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -978,17 +969,18 @@ namespace CSV_Redactor
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                //var tab = TabInfo.FindClassOfCurrentTab(Files_TabControl);
-                //if (tab is DataBase dataBase)
-                //{
-                //    var table = TabInfo.FindClassOfCurrentTab(dataBase.Tables_TabControl) as DataBaseTable;
-                //    table.IsStretchCells = (sender as ToolStripMenuItem).Checked;
-                //}
-                //else
-                //{
-                //    var file = tab as TextFile;
-                //    file.IsStretchCells = (sender as ToolStripMenuItem).Checked;
-                //}
+                ITab tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+                IDefaultFieldsOfTabs tabInfo = (IDefaultFieldsOfTabs)tab;
+
+                tabInfo.IsStretchCells = (sender as ToolStripMenuItem).Checked;
+
+                if (tabInfo.IsShowAsTable)
+                    Tab.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
+                else
+                {
+                    tabInfo.Data = tabInfo.ReadData();
+                    tabInfo.WriteData();
+                }
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }

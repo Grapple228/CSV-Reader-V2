@@ -7,6 +7,6 @@
     {
         abstract string FilePath { get; set; }
         abstract void LoadData();
-        abstract void Save();
+        abstract void SaveFile();
     }
 }

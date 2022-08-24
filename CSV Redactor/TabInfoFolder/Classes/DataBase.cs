@@ -96,7 +96,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         public abstract void CreateNewTab();
         protected abstract void LoadTables();
         public abstract void LoadData();
-        public abstract void Save();
+        public abstract void SaveFile();
     }
 
     internal class DataBaseSQLServer : DataBase
@@ -135,7 +135,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         public override void LoadData()
         {
         }
-        public override void Save()
+        public override void SaveFile()
         {
         }
         protected override void LoadTables()
@@ -206,7 +206,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         public override void LoadData()
         {
         }
-        public override void Save()
+        public override void SaveFile()
         {
         }
         protected override void LoadTables()
@@ -227,7 +227,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         public override void LoadData()
         {
         }
-        public override void Save()
+        public override void SaveFile()
         {
         }
         protected override void LoadTables()
@@ -254,7 +254,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         // IDefaultFieldsOfTabs
         public DataGridView DataGridView { get; protected set; }
         public RichTextBox TextBox { get; protected set; }
-        public List<string> Data { get; protected set; }
+        public List<string> Data { get; set; }
         public int ColumnCount { get; set; }
         public int FixedColumnCount { get; set; }
         public int RowCount { get; set; }
@@ -308,7 +308,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                 DataGridView.Rows.Clear();
             else TextBox.Text = TextBox.Lines[0];
         }
-        public void SaveAs()
+        public void SaveFileAs(string fileName = null)
         {
 
         }

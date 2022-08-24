@@ -4,10 +4,12 @@ using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Extensions
 {
-    public static class RichTextBoxExtensions
+    internal static class RichTextBoxExtensions
     {
         public static void AppendText(this RichTextBox box, string text, System.Drawing.Color color)
         {
