@@ -1,72 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using System.Xml.Linq;
+using CSV_Redactor.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using static CSV_Redactor.Main_Form;
 
 namespace CSV_Redactor
 {
-    internal class Methods
+    internal static class Methods
     {
-        /// <summary>
-        /// Преобразование имен в уникальные
-        /// </summary>
-        /// <param name="rawNames">Текущие именя</param>
-        /// <returns>string[] Уникальные имена</returns>
-        public static string[] GenColumnNames(string[] rawNames)
-        {
-            string[] names = new string[rawNames.Length];
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { rawNames });
-            try
-            {
-                for (int i = 0; i < rawNames.Length; i++)
-                {
-                    string curName = rawNames[i];
-
-                    string defName = GetFieldsFromSettings(SettingsFile, "global-defaultColumnName").Value;
-
-                    curName = curName == null || curName.ToString() == "" ?
-                        defName.Trim() :
-                        (curName.Substring(0, 1).ToUpper() + (curName.Length > 1 ? curName.Substring(1) : "")).Trim();
-
-                    if (names.Contains(curName))
-                    {
-                        int index = 2;
-                        string tempName = curName;
-                        while (names.Contains(tempName))
-                        {
-                            tempName = curName + "-" + index.ToString();
-                            index++;
-                        }
-                        curName = tempName.Trim();
-                    }
-
-                    names[i] = curName.Trim();
-                }
-            }
-            catch (Exception ex) { ExceptionProcessing(ex); }
-            return names;
-        }
-        /// <summary>
-        /// Создание уникального имени
-        /// </summary>
-        /// <returns>Уникальное имя</returns>
-        public static string CreateUniqueName(string oldName)
-        {
-            string name = "";
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { oldName });
-            try
-            {
-                name = $"{oldName}_{DateTime.Now}";
-            }
-            catch (Exception ex) { ExceptionProcessing(ex); }
-            return name;
-        }
         /// <summary>
         /// Открытие настроек программы
         /// </summary>
@@ -84,7 +35,7 @@ namespace CSV_Redactor
         /// </summary>
         /// <param name="baseDirectory">Путь до директории программы</param>
         /// <returns>Файл настроек</returns>
-        public static XDocument LoadSettingsFile(string baseDirectory)
+        public static SettingsClass LoadSettingsFile(string baseDirectory)
         {
             XDocument doc;
             TraceCalls(MethodBase.GetCurrentMethod(), new object[] { baseDirectory });
@@ -95,7 +46,8 @@ namespace CSV_Redactor
                     );
             }
             catch (FileNotFoundException) { doc = GenerateSettingsFile(); doc.Save(Path.Combine(baseDirectory, @"Settings.xml")); }
-            return doc;
+
+            return new(doc);
 
             static XDocument GenerateSettingsFile()
             {
@@ -104,33 +56,35 @@ namespace CSV_Redactor
                 XDocument doc = new(
                     new XElement("settings",
                         new XElement("global",
-                                new XElement("IsTracingEnabled", false),
-                                new XElement("defaultFileName", "New File"),
-                                new XElement("defaultTableName", "New Table"),
-                                new XElement("defaultColumnName", "Column"),
-                                new XElement("showStatusBar", true),
-                                new XElement("defaultFileExtension", ".csv"),
-                                new XElement("minimumWindowWidth", 800),
-                                new XElement("minimumWindowHeight", 600)
+                                new XComment("Окно"),
+                                new XElement("MinimumWindowWidth", 800),
+                                new XElement("MinimumWindowHeight", 600),
+                                 new XComment("Интерфейс"),
+                                new XElement("IsShowStatusBar", true),
+                                 new XComment("Таблица"),
+                                new XElement("DefaultColumnName", "Column"),
+                                 new XComment("Вкладка"),
+                                new XElement("DefaultFileName", "New File"),
+                                new XElement("DefaultTableName", "New Table"),
+                                 new XComment("Дополнительно"),
+                                new XElement("DefaultFileExtension", ".csv"), 
+                                new XElement("SupportedSeparators", ";,."),
+                                 new XComment("Отладка"),
+                                new XElement("IsTracingEnabled", false)
                             ),
                         new XElement("local",
                                 new XElement(
-                              "csv",
-                              new XElement("defaultColumnCount", 1),
-                              new XElement("defaultSeparator", ';'),
-                              new XElement("supportedSeparators", ";,."),
-                              new XElement("showAsTable", true),
-                              new XElement("stretchCells", true),
-                              new XElement("hideEmptyRows", false)
+                              "text",
+                              new XElement("DefaultColumnCount", 1),
+                              new XElement("IsShowAsTable", true),
+                              new XElement("IsStretchCells", true),
+                              new XElement("IsHideEmptyRows", false)
                               ),
                                 new XElement(
-                              "SQLite"
-                              ),
-                                new XElement(
-                              "MySQL"
-                              ),
-                                new XElement(
-                              "PostgreSQL"
+                              "database",
+                              new XElement("SQLServer"),
+                              new XElement("SQLite"),
+                              new XElement("MySQL")
                               )
                             )
                         )
@@ -190,7 +144,7 @@ namespace CSV_Redactor
             DialogResult result = DialogResult.Cancel;
             try
             {
-                message ??= "Вы не сохранили изменения в файле \"" + $"{TabInfo.TabsInfo.Find(tab => tab.FullTabName == TabInfo.CloseTabButton.Name).ShortTabName}" + "\"\nОни будут утеряны! Продолжить выполнение?";
+                message ??= "Вы не сохранили изменения в файле \"" + $"{OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.CloseTabButton.Name).ShortTabName}" + "\"\nОни будут утеряны! Продолжить выполнение?";
                 result = MessageBox.Show(message, "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
             }
             catch (Exception ex) { ExceptionProcessing(ex); }
@@ -208,7 +162,7 @@ namespace CSV_Redactor
             TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabInfo.TabsInfo.Find(tab => tab.FullTabName == TabInfo.Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.Files_TabControl.SelectedTab.Name);
 
                 List<string> Lines = new();
 
@@ -251,7 +205,7 @@ namespace CSV_Redactor
                         for (int i = 0; i < splittedLine.Length; i++)
                             splittedLine[i] = splittedLine[i].Trim();
 
-                        data.AddRange(GenColumnNames(splittedLine));
+                        //data.AddRange(GenColumnNames(splittedLine));
                         rowCount++;
                         continue;
                     }
@@ -281,11 +235,11 @@ namespace CSV_Redactor
                 }
 
                 tabInfo.ColumnCount = columnCount;
-                TabInfo.ColumnCount_TextBox.Text = columnCount.ToString();
+                OldTabInfo.ColumnCount_TextBox.Text = columnCount.ToString();
                 tabInfo.DataGridView.ColumnCount = tabInfo.ColumnCount;
 
                 tabInfo.RowCount = rowCount;
-                TabInfo.SetStatusBarInfoLabel(tabInfo);
+                //OldTabInfo.SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { ExceptionProcessing(ex); }
 
@@ -303,7 +257,7 @@ namespace CSV_Redactor
             TraceCalls(MethodBase.GetCurrentMethod(), new object[] { columnCount });
             try
             {
-                TabInfo tabInfo = TabInfo.TabsInfo.Find(tab => tab.FullTabName == TabInfo.Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.Files_TabControl.SelectedTab.Name);
                 if (columnCount > dataGridView.ColumnCount)
                     columnCount = dataGridView.ColumnCount;
                 int rowCount = 0;
@@ -313,7 +267,7 @@ namespace CSV_Redactor
                 {
                     names[i] = dataGridView.Columns[i].HeaderText.Trim();
                 }
-                data.AddRange(GenColumnNames(names));
+                //data.AddRange(GenColumnNames(names));
                 for (int i = 0; i < dataGridView.RowCount; i++)
                 {
                     if (dataGridView.Rows[i].IsNewRow) break;
@@ -342,7 +296,7 @@ namespace CSV_Redactor
                 tabInfo.ColumnCount = dataGridView.ColumnCount;
                 tabInfo.RowCount = rowCount;
 
-                TabInfo.SetStatusBarInfoLabel(tabInfo);
+                //OldTabInfo.SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { ExceptionProcessing(ex); }
 
@@ -358,7 +312,7 @@ namespace CSV_Redactor
         {
             try
             {
-                TabInfo tabInfo = TabInfo.TabsInfo.Find(tab => tab.FullTabName == TabInfo.Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.Files_TabControl.SelectedTab.Name);
 
                 object[] formattedData = data.ToArray();
                 List<int> separatorIndexes = new();
@@ -385,10 +339,10 @@ namespace CSV_Redactor
                 tabInfo.RowCount = rowCount;
 
                 textBox.Text = AddRows(rowCount, columnCount, formattedData, tabInfo);
-                TabInfo.SetStatusBarInfoLabel(tabInfo);
+                //OldTabInfo.SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { ExceptionProcessing(ex); }
-            static string AddRows(int rowCount, int columnCount, object[] formattedData, TabInfo tabInfo)
+            static string AddRows(int rowCount, int columnCount, object[] formattedData, OldTabInfo tabInfo)
             {
                 List<object> list = new();
                 for (int i = 0; i < columnCount; i++)
@@ -460,7 +414,7 @@ namespace CSV_Redactor
         {
             try
             {
-                TabInfo tabInfo = TabInfo.TabsInfo.Find(tab => tab.FullTabName == TabInfo.Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = OldTabInfo.TabsInfo.Find(tab => tab.FullTabName == OldTabInfo.Files_TabControl.SelectedTab.Name);
                 object[] formattedData = data.ToArray();
 
                 List<object> list = new();
@@ -506,7 +460,7 @@ namespace CSV_Redactor
                 else AddWithEmptyRows();
                 tabInfo.RowCount = rowCount;
 
-                TabInfo.SetStatusBarInfoLabel(tabInfo);
+                //OldTabInfo.SetStatusBarInfoLabel(tabInfo);
 
                 void AddWithEmptyRows()
                 {
@@ -636,24 +590,14 @@ namespace CSV_Redactor
             TraceErrorListenerText += $"{message}\n";
             //Methods.TraceCalls(MethodBase.GetCurrentMethod());
         }
-        /// <summary>
-        /// Изменить выравнивание в таблице
-        /// </summary>
-        /// <param name="dataGridView">Ссылка на экземпляр DataGridView</param>
-        /// <param name="isStretch">Условие выравнивания</param>
-        public static void ChangeStretchDataGridView(DataGridView dataGridView, bool isStretch)
+        public static ImageSource ToImageSource(this Icon icon)
         {
-            TraceCalls(MethodBase.GetCurrentMethod(), new object[] { isStretch });
-            if (isStretch)
-                foreach (DataGridViewColumn column in dataGridView.Columns)
-                {
-                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-                }
+            ImageSource imageSource = Imaging.CreateBitmapSourceFromHIcon(
+                icon.Handle,
+                System.Windows.Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
 
-            else
-                foreach (DataGridViewColumn column in dataGridView.Columns)
-                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            return imageSource;
         }
     }
 }

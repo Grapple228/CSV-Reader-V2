@@ -31,3 +31,15 @@ C:\Users\green\Source\Repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.cs
 C:\Users\green\Source\Repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.CoreCompileInputs.cache
 C:\Users\green\Source\Repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.exe
 C:\Users\green\Source\Repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.pdb
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\SettingsWindow.g.cs
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor_Content.g.cs
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor_MarkupCompile.cache
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor_MarkupCompile.lref
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\SettingsWindow.baml
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.g.resources
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\MenuButtonTheme.baml
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\ButtonTheme.baml
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\TextBoxTheme.baml
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\bin\Debug\System.Data.SqlClient.dll
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\bin\Debug\System.Data.SqlClient.xml
+C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.CopyComplete

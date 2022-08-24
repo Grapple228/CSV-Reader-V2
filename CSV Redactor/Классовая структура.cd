@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.DataBase">
+    <Position X="5.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAIAAQAAQAIAAAAAAAAABACAAAUgABABAAAAIAAI=</HashCode>
+      <FileName>TabInfoFolder\Classes\DataBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.DataBaseSQLServer">
+    <Position X="3.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAgAIAAUAAQAAEAAAAIABAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Classes\DataBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.DataBaseMySQL">
+    <Position X="5.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAIAAQAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Classes\DataBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.DataBaseSQLite">
+    <Position X="8" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAIAAQAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Classes\DataBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.DataBaseTable" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAIAACAAJBAIAABABAAAAAQCCgABABBBIAAABAAwA=</HashCode>
+      <FileName>TabInfoFolder\Classes\DataBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.Tab" Collapsed="true">
+    <Position X="11.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAUCBgAIACCAEIAAAAAABAAggAOEaAAABjAEACABA=</HashCode>
+      <FileName>TabInfoFolder\Classes\Tab.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.TextFile" Collapsed="true">
+    <Position X="1.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAIAACAAJBAIAAAABAAAAAQCCgARABBBIAgABAAwA=</HashCode>
+      <FileName>TabInfoFolder\Classes\TextFile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CSV_Redactor.TabInfoFolder.Classes.OpenedTextFile">
+    <Position X="1.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAIAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Classes\TextFile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Extensions.RichTextBoxExtensions" Collapsed="true">
+    <Position X="17.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Forms.SettingsWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Forms\SettingsWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CSV_Redactor.Forms.SettingsClass" Collapsed="true">
+    <Position X="15.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACIAAAEAQggAAAAAAAAAAAAABAAABAAIABIgAAQA=</HashCode>
+      <FileName>SettingsClass.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Handlers" Collapsed="true">
+    <Position X="14" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABIKIDtBwBAKBGAIEUJBAABgJQIYAAQikgAACAAAHGg=</HashCode>
+      <FileName>Handlers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Main_Form" Collapsed="true">
+    <Position X="15.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAAAAAEAAGAABgABIACAAAADAAAACAACgAAAAIiACAA=</HashCode>
+      <FileName>Main_Form.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Methods" Collapsed="true">
+    <Position X="17.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAIAAAQAABAAAAAAAACAAQgAAgABAAAAAAAAAAQAA=</HashCode>
+      <FileName>Methods.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Program" Collapsed="true">
+    <Position X="14" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Properties.Resources" Collapsed="true">
+    <Position X="15.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAJAAAABEAAAAQAAAAAABBAAAAAQAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSV_Redactor.Properties.Settings" Collapsed="true">
+    <Position X="14" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAQAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="CSV_Redactor.TabInfoFolder.Interfaces.IDefaultFieldsOfTabs" Collapsed="true">
+    <Position X="10" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Interfaces\IDefaultFieldsOfTabs.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CSV_Redactor.TabInfoFolder.Interfaces.IFile" Collapsed="true">
+    <Position X="11.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Interfaces\IFile.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CSV_Redactor.TabInfoFolder.Interfaces.ITab" Collapsed="true">
+    <Position X="10" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAIAAAAAAAAAAACAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>TabInfoFolder\Interfaces\ITab.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="System.Windows.Markup.IComponentConnector" Collapsed="true">
+    <Position X="11.75" Y="3" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

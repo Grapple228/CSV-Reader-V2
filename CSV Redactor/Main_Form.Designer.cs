@@ -143,10 +143,12 @@
             this.Controls.Add(this.Files_TabControl);
             this.Controls.Add(this.ActionButtons_ToolStrip);
             this.Controls.Add(this.ProgramActionsBar);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.ProgramActionsBar;
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "Main_Form";
             this.Text = "CSV Redactor";
+            this.Load += new System.EventHandler(this.Main_Form_Load);
             this.ActionButtons_ToolStrip.ResumeLayout(false);
             this.ActionButtons_ToolStrip.PerformLayout();
             this.StatusBar.ResumeLayout(false);

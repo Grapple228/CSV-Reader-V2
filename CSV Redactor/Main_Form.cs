@@ -5,6 +5,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using CSV_Redactor.Forms;
+using CSV_Redactor.TabInfoFolder.Classes;
 using static CSV_Redactor.Main_Form;
 
 namespace CSV_Redactor
@@ -16,7 +18,7 @@ namespace CSV_Redactor
     public partial class Main_Form : Form
     {
         public readonly static string BaseDirectory;
-        public readonly static XDocument SettingsFile;
+        public static SettingsClass Settings;
         public readonly static bool IsTraceCallsEnabled;
         public static TextWriterTraceListener TraceListener;
         public static string TraceErrorListenerText = "";
@@ -25,9 +27,9 @@ namespace CSV_Redactor
         static Main_Form()
         {
             BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            SettingsFile = Methods.LoadSettingsFile(BaseDirectory);
-            IsTraceCallsEnabled = Convert.ToBoolean(Methods.GetFieldsFromSettings(SettingsFile, "global-IsTracingEnabled").Value);
-            IsShowStatusBar = Convert.ToBoolean(Methods.GetFieldsFromSettings(SettingsFile, "global-IsShowStatusBar").Value);
+            Settings = Methods.LoadSettingsFile(BaseDirectory);
+            IsTraceCallsEnabled = Settings.IsTracingEnabled;
+            IsShowStatusBar = Settings.IsShowStatusBar;
             if (IsTraceCallsEnabled)
                 FillTraceListener();
             
@@ -44,19 +46,16 @@ namespace CSV_Redactor
                     Trace.Listeners.Add(TraceListener);
                 }
                 catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-            }
+            }         
         }
         public Main_Form()
         {
             try
             {
                 InitializeComponent();
-                XElement globalSettings = Methods.GetFieldsFromSettings(SettingsFile, "global");
-                int width = Convert.ToInt32(globalSettings.Element("minimumWindowWidth").Value),
-                    height = Convert.ToInt32(globalSettings.Element("minimumWindowHeight").Value);
-                Height = height;
-                Width = width;
-                MinimumSize = new(width, height);
+                Height = Settings.MinimumWindowHeight;
+                Width = Settings.MinimumWindowWidth;
+                MinimumSize = new(Width, Height);
 
                 FillActionsBar();
                 if (!IsShowStatusBar)
@@ -68,16 +67,21 @@ namespace CSV_Redactor
                 AddEventHandlersToFormComponents();
                 AddImageListToTabs();
                 StartPosition = FormStartPosition.CenterScreen;
-
-                if(IsTraceCallsEnabled)
-                    Debug.WriteLine($"{DateTime.Now:yyyy.MM.dd HH:mm:ss.fff} Выполнен запуск программы\n");
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
 
+        private void Main_Form_Load(object sender, EventArgs e)
+        {
+            Tab.ChangeProgramMenuAvailability();
+
+            if (IsTraceCallsEnabled)
+                Debug.WriteLine($"{DateTime.Now:yyyy.MM.dd HH:mm:ss.fff} Выполнен запуск программы\n");
+        }
+
         #region Класс TabInfo
-        // Поля TabInfo
-        public partial class TabInfo
+        // Поля OldTabInfo
+        public partial class OldTabInfo
         {
             #region Default Form Components
             public static Form MainForm_Form { get; }
@@ -90,7 +94,7 @@ namespace CSV_Redactor
             #endregion
 
             // Остальные поля
-            public static List<TabInfo> TabsInfo { get; }
+            public static List<OldTabInfo> TabsInfo { get; }
             public static Button CloseTabButton { get; }
             public static int ClickedTabNumber { get; set; }
             public static int ClickedRowIndex { get; set; }
@@ -121,13 +125,13 @@ namespace CSV_Redactor
             public RichTextBox TextBox { get; private set; }
         }
 
-        // Конструкторы TabInfo
-        public partial class TabInfo
+        // Конструкторы OldTabInfo
+        public partial class OldTabInfo
         {
             /// <summary>
-            /// Статический конструктор класса TabInfo
+            /// Статический конструктор класса OldTabInfo
             /// </summary>
-            static TabInfo()
+            static OldTabInfo()
             {
                 try
                 {
@@ -139,7 +143,7 @@ namespace CSV_Redactor
                     QickActionsMenu_ToolStrip = (ToolStrip)MainForm_Form.Controls["ActionButtons_ToolStrip"];
                     ColumnCount_TextBox = (ToolStripTextBox)QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"];
 
-                    TabsInfo = new List<TabInfo>();
+                    TabsInfo = new List<OldTabInfo>();
                     CloseTabButton = new Button();
                     {
                         CloseTabButton.Padding = new Padding(0, 0, 0, 0);
@@ -160,30 +164,28 @@ namespace CSV_Redactor
                 catch (Exception ex) { Methods.ExceptionProcessing(ex); }
             }
             /// <summary>
-            /// Конструктор класса TabInfo
+            /// Конструктор класса OldTabInfo
             /// </summary>
             /// <param name="dataGridView">Ссылка на DataGridView</param>
             /// <param name="textBox">Ссылка на RichTextBox</param>
-            public TabInfo(string fullTabName, string shortTabName, string extension, DataGridView dataGridView = null, RichTextBox textBox = null)
+            public OldTabInfo(string fullTabName, string shortTabName, string extension, DataGridView dataGridView = null, RichTextBox textBox = null)
             {
                 try
                 {
-                    XElement localCsvSettings = Methods.GetFieldsFromSettings(SettingsFile, "local-csv");
-
                     FullTabName = fullTabName;
                     ShortTabName = shortTabName;
                     Extension = extension;
                     IsChanged = false;
-                    IsHideEmptyRows = Convert.ToBoolean(localCsvSettings.Element("hideEmptyRows").Value);
-                    IsShowAsTable = Convert.ToBoolean(localCsvSettings.Element("showAsTable").Value);
-                    IsStretchCells = Convert.ToBoolean(localCsvSettings.Element("stretchCells").Value);
+                    IsHideEmptyRows = Settings.IsHideEmptyRows;
+                    IsShowAsTable = Settings.IsShowAsTable;
+                    IsStretchCells = Settings.IsStretchCells;
                     IsFileOpened = false;
                     IsDataBase = false;
-                    ColumnCount = Convert.ToInt32(localCsvSettings.Element("defaultColumnCount").Value);
+                    ColumnCount = Settings.DefaultColumnCount;
                     FixedColumnCount = ColumnCount;
                     RowCount = 0;
                     IsFixed = false;
-                    Separator = Convert.ToChar(localCsvSettings.Element("defaultSeparator").Value);
+                    Separator = Settings.SupportedSeparators[0];
                     Data = new List<object>();
 
                     DataGridView = dataGridView;
@@ -191,8 +193,6 @@ namespace CSV_Redactor
 
                     DataGridView.Visible = IsShowAsTable;
                     TextBox.Visible = !IsShowAsTable;
-
-                    ChangeProgramMenuAvailability(true, this);
                 }
                 catch (Exception ex) { Methods.ExceptionProcessing(ex); }
             }
@@ -202,7 +202,7 @@ namespace CSV_Redactor
             /// <param name="tabInfo">Экземпляр класса</param>
             /// <param name="dataGridView">Новый экземпляр DataGridView</param>
             /// <param name="textBox">Новый экземпляр RichTextBox</param>
-            public TabInfo(TabInfo tabInfo, DataGridView dataGridView, RichTextBox textBox)
+            public OldTabInfo(OldTabInfo tabInfo, DataGridView dataGridView, RichTextBox textBox)
             {
                 try
                 {
@@ -224,66 +224,13 @@ namespace CSV_Redactor
             }
         }
 
-        // Методы TabInfo
+        // Методы OldTabInfo
         /// <summary>
         /// Информация о вкладках Files_TabControl
         /// </summary>
-        public partial class TabInfo
+        public partial class OldTabInfo
         {
-            /// <summary>
-            /// Создание новой вкладки TabPage
-            /// </summary>
-            /// <param name="pageName">Имя создаваемой вкладки</param>
-            /// <returns>TabPage</returns>
-            public static TabPage CreateNewTabPage(string pageName)
-            {
-                Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { pageName});
-                TabPage newPage = new(pageName);
-                try
-                {
-                    string newName = Methods.CreateUniqueName(pageName);
-                    newPage.Name = newName;
 
-                    DataGridView dataGridView = new()
-                    {
-                        Name = newName + "_DataGridView",
-                        Dock = DockStyle.Fill,
-                        BackgroundColor = System.Drawing.SystemColors.Control,
-                        AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
-                    };
-                    DataGridViewColumn dataGridViewColumn = new() { CellTemplate = new DataGridViewTextBoxCell() };
-                    dataGridView.Columns.Add(dataGridViewColumn);
-                    dataGridView.DefaultCellStyle.Font = new System.Drawing.Font("Lucida Console", 9.5f);
-                    dataGridView.ColumnHeadersDefaultCellStyle.Font =
-                        dataGridView.RowHeadersDefaultCellStyle.Font =
-                        new System.Drawing.Font("Lucida Console", 10.5f, System.Drawing.FontStyle.Italic);
-
-                    dataGridView.CellMouseClick += Handlers.DataGridView_CellMouseClick;
-                    dataGridView.CellEndEdit += Handlers.DataGridView_CellEndEdit;
-                    dataGridView.DefaultValuesNeeded += Handlers.DataGridView_DefaultValuesNeeded;
-                    dataGridView.RowsAdded += Handlers.DataGridView_RowsAdded;
-                    newPage.Controls.Add(dataGridView);
-
-                    RichTextBox textBox = new()
-                    {
-                        Name = newName + "_TextBox",
-                        Dock = DockStyle.Fill,
-                        Visible = false,
-                        Multiline = true,
-                        ScrollBars = RichTextBoxScrollBars.Both,
-                        WordWrap = false,
-                        BackColor = System.Drawing.SystemColors.Control,
-                        Font = new System.Drawing.Font("Lucida Console", 11)
-                    };
-                    textBox.TextChanged += Handlers.TextBox_TextChanged;
-
-                    newPage.Controls.Add(textBox);
-
-                    ChangeProgramMenuAvailability(true);
-                }
-                catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-                return newPage;
-            }
             /// <summary>
             /// Создать контекстное меню для нажатия по вкладке
             /// </summary>
@@ -487,11 +434,13 @@ namespace CSV_Redactor
                     ((ToolStripMenuItem)itemsInFile["openFile"]).Enabled = true;
                     ((ToolStripMenuItem)itemsInFile["saveFile"]).Enabled = availability;
                     ((ToolStripMenuItem)itemsInFile["saveFileAs"]).Enabled = availability;
+
                     ToolStripItemCollection itemsInDataBase = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["dataBase"]).DropDown.Items;
                     // database items
                     ToolStripItemCollection itemsInEdit = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["edit"]).DropDown.Items;
                     ((ToolStripMenuItem)itemsInEdit["refresh"]).Enabled = availability;
                     ((ToolStripMenuItem)itemsInEdit["clear"]).Enabled = availability;
+
                     ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
                     ((ToolStripMenuItem)itemsInView["showStatusBar"]).Enabled = true;
                     ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Enabled = availability;
@@ -503,80 +452,11 @@ namespace CSV_Redactor
                 }
                 catch (Exception ex) { Methods.ExceptionProcessing(ex); }
             }
-            /// <summary>
-            /// Изменение видимости элементов программного меню для экземпляра класса
-            /// </summary>
-            /// <param name="availability">Доступность</param>
-            /// <param name="tabInfo">Экземпляр класса</param>
-            public static void ChangeProgramMenuAvailability(bool availability, TabInfo tabInfo)
-            {
-                Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { availability, tabInfo});
-                try
-                {
-                    switch (tabInfo.Extension)
-                    {
-                        case ".csv": TextFile(); return;
-                    }
-
-                    async void TextFile()
-                    {
-                        ToolStripItemCollection itemsInFile = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["file"]).DropDown.Items;
-                        ((ToolStripMenuItem)itemsInFile["createFile"]).Enabled = true;
-                        ((ToolStripMenuItem)itemsInFile["openFile"]).Enabled = true;
-                        ((ToolStripMenuItem)itemsInFile["saveFile"]).Enabled = tabInfo.IsFileOpened;
-                        //((ToolStripMenuItem)itemsInFile["saveFile"]).Enabled = tabInfo.IsFileOpened && !tabInfo.IsDataBase;
-                        ((ToolStripMenuItem)itemsInFile["saveFileAs"]).Enabled = true;
-                        ToolStripItemCollection itemsInDataBase = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["dataBase"]).DropDown.Items;
-                        // database items
-                        ToolStripItemCollection itemsInEdit = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["edit"]).DropDown.Items;
-                        ((ToolStripMenuItem)itemsInEdit["refresh"]).Enabled = tabInfo.IsFileOpened;
-                        ((ToolStripMenuItem)itemsInEdit["clear"]).Enabled = availability;
-
-                        ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
-                        ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Enabled = true;
-                        ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Checked = tabInfo.IsHideEmptyRows;
-                        ((ToolStripMenuItem)itemsInView["showAsTable"]).Enabled = true;
-                        ((ToolStripMenuItem)itemsInView["showAsTable"]).Checked = tabInfo.IsShowAsTable;
-                        ((ToolStripMenuItem)itemsInView["stretchCells"]).Enabled = true;
-                        ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = tabInfo.IsStretchCells;
-
-                        QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                        QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                        QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Visible = tabInfo.IsShowAsTable;
-                        ToolStripMenuItem hideEmptyRows = (ToolStripMenuItem)itemsInView["hideEmptyRows"];
-                        hideEmptyRows.Checked = false;
-                        hideEmptyRows.Enabled = tabInfo.IsShowAsTable;
-                        tabInfo.IsHideEmptyRows = hideEmptyRows.Checked;
-                    }
-                }
-                catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-            }
-            /// <summary>
-            /// Изменение информации об открытой вкладке
-            /// </summary>
-            /// <param name="tabInfo">Ссылка на экземпляр TabInfo</param>
-            public static void SetStatusBarInfoLabel(TabInfo tabInfo)
-            {
-                try
-                {
-                    if (tabInfo.IsShowAsTable)
-                    {
-                        tabInfo.RowCount = tabInfo.DataGridView.RowCount - 1;
-                        TabInfo_ToolStripLabel.Text = $"Столбцов : {tabInfo.ColumnCount}   Строк : {tabInfo.RowCount}";
-                    }
-                    else
-                    {
-                        tabInfo.RowCount = tabInfo.TextBox.Lines.Length;
-                        TabInfo_ToolStripLabel.Text = $"Строк : {tabInfo.TextBox.Lines.Length}";
-                    }
-                }
-                catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-            }
         }
         #endregion
 
         /// <summary>
-        /// Заполнение ImageList в TabControl
+        /// Заполнение ImageList в Main_TabControl
         /// </summary>
         private void AddImageListToTabs()
         {
@@ -585,8 +465,8 @@ namespace CSV_Redactor
             {
                 ImageList imageList = new();
                 imageList.Images.Add(new System.Drawing.Bitmap(Properties.Resources.csv));
-                imageList.Images.Add(new System.Drawing.Bitmap(Properties.Resources.database));
                 imageList.Images.Add(new System.Drawing.Bitmap(Properties.Resources.file));
+                imageList.Images.Add(new System.Drawing.Bitmap(Properties.Resources.database));
                 Files_TabControl.ImageList = imageList;
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
@@ -604,13 +484,13 @@ namespace CSV_Redactor
                 {
                     ContextMenuStrip fileContextMenu = new();
 
-                    ToolStripMenuItem createFile = new("Создать") { Name = "createFile", Checked = false, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.N };
+                    ToolStripMenuItem createFile = new("Создать") { Name = "createFile",  ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.N };
                     createFile.Click += Handlers.CreateFile_Click;
-                    ToolStripMenuItem openFile = new("Открыть") { Name = "openFile", Checked = false, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.O };
+                    ToolStripMenuItem openFile = new("Открыть") { Name = "openFile", ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.O };
                     openFile.Click += Handlers.OpenFile_Click;
-                    ToolStripMenuItem saveFile = new("Сохранить") { Name = "saveFile", Checked = false, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.S };
+                    ToolStripMenuItem saveFile = new("Сохранить") { Name = "saveFile", ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.S };
                     saveFile.Click += Handlers.SaveFile_Click;
-                    ToolStripMenuItem saveFileAs = new("Сохранить как") { Name = "saveFileAs", Checked = false, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.Shift | Keys.S };
+                    ToolStripMenuItem saveFileAs = new("Сохранить как") { Name = "saveFileAs",ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.Shift | Keys.S };
                     saveFileAs.Click += Handlers.SaveFileAs_Click;
 
                     fileContextMenu.Items.AddRange(new[] { createFile, openFile, saveFile, saveFileAs });
@@ -624,7 +504,7 @@ namespace CSV_Redactor
                 {
                     ContextMenuStrip dataBaseContextMenu = new();
 
-                    ToolStripMenuItem openDB = new("Открыть") { Name = "openDB", Checked = false, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.Shift | Keys.O };
+                    ToolStripMenuItem openDB = new("Открыть") { Name = "openDB", ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.Shift | Keys.O };
                     openDB.Click += Handlers.OpenDataBase_Click;
 
                     dataBaseContextMenu.Items.AddRange(new[] { openDB });
@@ -638,9 +518,9 @@ namespace CSV_Redactor
                 {
                     ContextMenuStrip editContextMenu = new();
 
-                    ToolStripMenuItem refresh = new("Обновить") { Name = "refresh", Checked = false, Enabled = false, ShowShortcutKeys = true, ShortcutKeys = Keys.F5 };
+                    ToolStripMenuItem refresh = new("Обновить") { Name = "refresh", ShowShortcutKeys = true, ShortcutKeys = Keys.F5 };
                     refresh.Click += Handlers.Refresh_Click;
-                    ToolStripMenuItem clear = new("Очистить") { Name = "clear", Checked = false, Enabled = false, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.Delete };
+                    ToolStripMenuItem clear = new("Очистить") { Name = "clear", ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.Delete };
                     clear.Click += Handlers.Clear_Click;
 
                     editContextMenu.Items.AddRange(new[] { refresh, clear });
@@ -654,13 +534,13 @@ namespace CSV_Redactor
                 {
                     ContextMenuStrip viewContextMenu = new();
 
-                    ToolStripMenuItem showStatusBar = new("Отображение строки состояния") { Name = "showStatusBar", Checked = IsShowStatusBar, CheckOnClick = true, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.I };
+                    ToolStripMenuItem showStatusBar = new("Отображение строки состояния") { Name = "showStatusBar", CheckOnClick = true, Checked = Settings.IsShowStatusBar, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.I };
                     showStatusBar.Click += Handlers.ShowStatusBar_Click;
-                    ToolStripMenuItem hideEmptyRows = new("Сокрытие пустых строк") { Name = "hideEmptyRows", Checked = false, CheckOnClick = true, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.H };
+                    ToolStripMenuItem hideEmptyRows = new("Сокрытие пустых строк") { Name = "hideEmptyRows", CheckOnClick = true, ShowShortcutKeys = true,  ShortcutKeys = Keys.Control | Keys.H };
                     hideEmptyRows.Click += Handlers.HideEmptyRows_Click;
-                    ToolStripMenuItem showAsTable = new("Отображение в виде таблицы") { Name = "showAsTable", Checked = false, CheckOnClick = true, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.T };
+                    ToolStripMenuItem showAsTable = new("Отображение в виде таблицы") { Name = "showAsTable", CheckOnClick = true, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.T };
                     showAsTable.Click += Handlers.ShowAsTable_Click;
-                    ToolStripMenuItem stretchCells = new("Выравнивание по ширине") { Name = "stretchCells", Checked = false, CheckOnClick = true, ShowShortcutKeys = true, Enabled = false, ShortcutKeys = Keys.Control | Keys.G };
+                    ToolStripMenuItem stretchCells = new("Выравнивание по ширине") { Name = "stretchCells", CheckOnClick = true, ShowShortcutKeys = true, ShortcutKeys = Keys.Control | Keys.G };
                     stretchCells.Click += Handlers.StretchCells_Click;
 
                     viewContextMenu.Items.AddRange(new[] { showStatusBar, hideEmptyRows, showAsTable, stretchCells });
@@ -669,12 +549,24 @@ namespace CSV_Redactor
                     ((ContextMenuStrip)view.DropDown).ShowImageMargin = false;
                     ((ContextMenuStrip)view.DropDown).ShowCheckMargin = true;
                 }
-                ProgramActionsBar.Items.AddRange(new[] { file, dataBase, edit, view });
+
+                ToolStripMenuItem settings = new("Настройки")
+                {
+                    Name = "settings",
+                    Image = new System.Drawing.Bitmap(Properties.Resources.setting),
+                    Alignment = ToolStripItemAlignment.Right,
+                    DisplayStyle = ToolStripItemDisplayStyle.Image,
+                    Margin = new System.Windows.Forms.Padding(0, 0, 7, 0),
+                    Padding = new System.Windows.Forms.Padding(0),
+                    ShortcutKeys = Keys.Control | Keys.P,
+                };
+                settings.Click += Handlers.ShowSettings_Click;
+
+                ProgramActionsBar.Items.AddRange(new[] { file, dataBase, edit, view, settings });
 
                 /* Получение доступа к элементам выпадающего меню
                 ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["file"]).DropDown.Items;
                 ToolStripMenuItem showStatusBar = (ToolStripMenuItem)itemsInView["showStatusBar"];
-                ToolStripMenuItem hideEmptyRows = (ToolStripMenuItem)itemsInView["hideEmptyRows"];
                  */
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
@@ -693,7 +585,6 @@ namespace CSV_Redactor
                 decreaseColumnCount_Button.Click += Handlers.DecreaseButton_Click;
 
                 // TEXTBOX
-                //columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged;
                 columnCountBox_TextBox.TextChanged += Handlers.ColumnCountBox_TextChanged;
 
                 // TAB CONTROL

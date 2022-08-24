@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
+using System.Windows.Forms.Integration;
+using System.Windows.Interop;
+using CSV_Redactor.Forms;
+using CSV_Redactor.TabInfoFolder.Classes;
+using CSV_Redactor.TabInfoFolder.Interfaces;
 using static CSV_Redactor.Main_Form;
-using static CSV_Redactor.Main_Form.TabInfo;
+using static CSV_Redactor.Main_Form.OldTabInfo;
 
 namespace CSV_Redactor
 {
@@ -19,91 +21,85 @@ namespace CSV_Redactor
         // sw.Restart();
         // sw.Stop();
 
-        /// <summary>
-        /// Переменная, предотвращающая открытие нескольких диалоговых окон
-        /// </summary>
-        static bool isDialogAlreadyOpened;
-
         #region Tab Components 
 
         #region Data Grid View
-        public static void DataGridView_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        internal static void DataGridView_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            return;
             try
             {
-                ClickedRowIndex = e.RowIndex;
-                ClickedColumnIndex = e.ColumnIndex;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                DataGridView dataGrid = tabInfo.DataGridView;
-
-                if (e.Button == MouseButtons.Right)
-                {
-                    if (e.ColumnIndex == -1 && e.RowIndex == -1) return;
-                    if (e.RowIndex == -1)
-                    {
-                        ContextMenuOnHeaderClick.Items["Переместить влево"].Enabled = ClickedColumnIndex != 0;
-                        ContextMenuOnHeaderClick.Items["Переместить вправо"].Enabled = ClickedColumnIndex != tabInfo.ColumnCount - 1;
-                        ContextMenuOnHeaderClick.Items["Вставить слева"].Enabled = CopiedColumns != null;
-                        ContextMenuOnHeaderClick.Items["Вставить справа"].Enabled = CopiedColumns != null;
-                        ContextMenuOnHeaderClick.Items["Вставить в текущий"].Enabled = CopiedColumns != null;
-                        ContextMenuOnHeaderClick.Show(Cursor.Position);
-                    }
-                    else if (!dataGrid.Rows[e.RowIndex].IsNewRow)
-                    {
-                        ContextMenuOnRowClick.Items["Переместить выше"].Enabled = ClickedRowIndex != 0;
-                        ContextMenuOnRowClick.Items["Переместить ниже"].Enabled = ClickedRowIndex != tabInfo.RowCount - 1;
-                        ContextMenuOnRowClick.Items["Вставить"].Enabled = CopiedRows != null;
-                        ContextMenuOnRowClick.Items["Вставить в текущую"].Enabled = CopiedRows != null;
-                        ContextMenuOnRowClick.Items["Очистить"].Enabled = !tabInfo.IsHideEmptyRows;
-                        ContextMenuOnRowClick.Show(Cursor.Position);
-                    }
-                    else if (dataGrid.Rows[e.RowIndex].IsNewRow)
-                    {
-                        ContextMenuOnNewRowClick.Items["Вставить"].Enabled = CopiedRows != null;
-                        ContextMenuOnNewRowClick.Show(Cursor.Position);
-                    }
-                }
-                if (e.Button == MouseButtons.Left)
-                {
-                    if (e.RowIndex == -1)
-                    {
-                        if (e.Button == MouseButtons.Left && Control.ModifierKeys == Keys.Shift)
-                        {
-                            // Добавить текущую к выделенным
-                            dataGrid.Columns[ClickedColumnIndex].Selected = true;
-                        }
-                        else
-                        {
-                            // Выделить только текущую
-                            dataGrid.ClearSelection();
-                            dataGrid.Columns[ClickedColumnIndex].Selected = true;
-                        }
-                    }
-                }
+                //Tab.ClickedRowIndex = e.RowIndex;
+                //Tab.ClickedColumnIndex = e.ColumnIndex;
+                //DataGridView dataGridView = (DataGridView)sender;
+                //if (e.Button == MouseButtons.Right)
+                //{
+                //    if (e.ColumnIndex == -1 && e.RowIndex == -1) return;
+                //    if (e.RowIndex == -1)
+                //    {
+                //        ContextMenuOnHeaderClick.Items["Переместить влево"].Enabled = ClickedColumnIndex != 0;
+                //        ContextMenuOnHeaderClick.Items["Переместить вправо"].Enabled = ClickedColumnIndex != tabInfo.ColumnCount - 1;
+                //        ContextMenuOnHeaderClick.Items["Вставить слева"].Enabled = CopiedColumns != null;
+                //        ContextMenuOnHeaderClick.Items["Вставить справа"].Enabled = CopiedColumns != null;
+                //        ContextMenuOnHeaderClick.Items["Вставить в текущий"].Enabled = CopiedColumns != null;
+                //        ContextMenuOnHeaderClick.Show(Cursor.Position);
+                //    }
+                //    else if (!dataGrid.Rows[e.RowIndex].IsNewRow)
+                //    {
+                //        ContextMenuOnRowClick.Items["Переместить выше"].Enabled = ClickedRowIndex != 0;
+                //        ContextMenuOnRowClick.Items["Переместить ниже"].Enabled = ClickedRowIndex != tabInfo.RowCount - 1;
+                //        ContextMenuOnRowClick.Items["Вставить"].Enabled = CopiedRows != null;
+                //        ContextMenuOnRowClick.Items["Вставить в текущую"].Enabled = CopiedRows != null;
+                //        ContextMenuOnRowClick.Items["Очистить"].Enabled = !tabInfo.IsHideEmptyRows;
+                //        ContextMenuOnRowClick.Show(Cursor.Position);
+                //    }
+                //    else if (dataGrid.Rows[e.RowIndex].IsNewRow)
+                //    {
+                //        ContextMenuOnNewRowClick.Items["Вставить"].Enabled = CopiedRows != null;
+                //        ContextMenuOnNewRowClick.Show(Cursor.Position);
+                //    }
+                //}
+                //if (e.Button == MouseButtons.Left)
+                //{
+                //    if (e.RowIndex == -1)
+                //    {
+                //        if (e.Button == MouseButtons.Left && Control.ModifierKeys == Keys.Shift)
+                //        {
+                //            // Добавить текущую к выделенным
+                //            dataGrid.Columns[ClickedColumnIndex].Selected = true;
+                //        }
+                //        else
+                //        {
+                //            // Выделить только текущую
+                //            dataGrid.ClearSelection();
+                //            dataGrid.Columns[ClickedColumnIndex].Selected = true;
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        internal static void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            return;
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                DataGridView dataGridView = tabInfo.DataGridView;
-                int neededCount = (e.RowIndex + 2) * dataGridView.ColumnCount;
-                if (tabInfo.Data.Count < neededCount)
-                {
-                    int difference = neededCount - tabInfo.Data.Count;
-                    tabInfo.Data.InsertRange(neededCount - difference, new object[difference]);
-                }
+                //OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                //DataGridView dataGridView = tabInfo.DataGridView;
+                //int neededCount = (e.RowIndex + 2) * dataGridView.ColumnCount;
+                //if (tabInfo.Data.Count < neededCount)
+                //{
+                //    int difference = neededCount - tabInfo.Data.Count;
+                //    tabInfo.Data.InsertRange(neededCount - difference, new object[difference]);
+                //}
 
-                tabInfo.Data[(e.RowIndex + 1) * dataGridView.ColumnCount + e.ColumnIndex] = dataGridView[e.ColumnIndex, e.RowIndex].Value;
+                //tabInfo.Data[(e.RowIndex + 1) * dataGridView.ColumnCount + e.ColumnIndex] = dataGridView[e.ColumnIndex, e.RowIndex].Value;
 
-                tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
+                //tabInfo.IsChanged = true;
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DataGridView_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e)
+        internal static void DataGridView_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e)
         {
             try
             {
@@ -115,29 +111,45 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        internal static void DataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
+            return;
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                tabInfo.RowCount = tabInfo.DataGridView.RowCount - 1;
-                SetStatusBarInfoLabel(tabInfo);
+                //OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                //tabInfo.RowCount = tabInfo.DataGridView.RowCount - 1;
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
         #endregion
 
         #region Rich Text Box
-        public static void TextBox_TextChanged(object sender, EventArgs e)
+        internal static void TextBox_TextChanged(object sender, EventArgs e)
         {
+            return;
             try
             {
                 if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                SetStatusBarInfoLabel(tabInfo);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
+        #endregion
+
+        #region ListBox
+        internal static void ListBox_DoubleClick(object sender, EventArgs e)
+        {
+            ListBox listBox = (ListBox)sender;
+            if (listBox.SelectedItem != null)
+            {
+                DataBase tab = (DataBase)Tab.FindClassOfCurrentTab(Tab.Main_TabControl, false);
+                tab.CreateNewTab();
+            }
+        }
+
+        #endregion
+        #region TabControl
+
         #endregion
 
         #endregion
@@ -146,19 +158,19 @@ namespace CSV_Redactor
         #region Context Menu
 
         #region ContextMenuOnHeaderClick
-        public static void ChangeHeader_Click(object sender, EventArgs e)
+        internal static void ChangeHeader_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
                 var clickedColumn = dataGridView.Columns[ClickedColumnIndex].HeaderText = (ClickedColumnIndex + 1).ToString();
                 tabInfo.IsChanged = true;
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void PinColumn_Click(object sender, EventArgs e)
+        internal static void PinColumn_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -167,12 +179,12 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void MoveColumnToLeft_Click(object sender, EventArgs e)
+        internal static void MoveColumnToLeft_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 var clickedHeader = dataGridView.Columns[ClickedColumnIndex].HeaderCell;
@@ -191,12 +203,12 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void MoveColumnToRight_Click(object sender, EventArgs e)
+        internal static void MoveColumnToRight_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 var clickedHeader = dataGridView.Columns[ClickedColumnIndex].HeaderCell;
@@ -215,12 +227,12 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void AddColumnToLeft_Click(object sender, EventArgs e)
+        internal static void AddColumnToLeft_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int selectedColumnCount = dataGridView.SelectedColumns.Count;
@@ -237,7 +249,7 @@ namespace CSV_Redactor
         }
         //public static void AddRowLower_Click(object sender, EventArgs e)
         //{
-        //    TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+        //    OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
         //    DataGridView dataGridView = tabInfo.DataGridView;
 
         //    int selectedRowCount = dataGridView.SelectedRows.Count;
@@ -267,7 +279,7 @@ namespace CSV_Redactor
 
         //    tabInfo.Data = ReadData(dataGridView, tabInfo.ColumnCount);
         //}
-        public static void AddColumnToRight_Click(object sender, EventArgs e)
+        internal static void AddColumnToRight_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -276,7 +288,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DuplicateColumn_Click(object sender, EventArgs e)
+        internal static void DuplicateColumn_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -285,7 +297,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void CopyColumn_Click(object sender, EventArgs e)
+        internal static void CopyColumn_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -294,7 +306,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void CutColumn_Click(object sender, EventArgs e)
+        internal static void CutColumn_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -303,7 +315,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void InsertColumnToLeft_Click(object sender, EventArgs e)
+        internal static void InsertColumnToLeft_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -312,7 +324,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void InsertColumnToRight_Click(object sender, EventArgs e)
+        internal static void InsertColumnToRight_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -321,7 +333,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void ClearColumn_Click(object sender, EventArgs e)
+        internal static void ClearColumn_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -330,7 +342,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void RemoveColumn_Click(object sender, EventArgs e)
+        internal static void RemoveColumn_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -342,12 +354,12 @@ namespace CSV_Redactor
         #endregion
 
         #region ContextMenuOnRowClick
-        public static void MoveRowUpper_Click(object sender, EventArgs e)
+        internal static void MoveRowUpper_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 for (int i = 0; i < tabInfo.DataGridView.Columns.Count; i++)
@@ -362,16 +374,15 @@ namespace CSV_Redactor
                     tabInfo.Data[(ClickedRowIndex) * dataGridView.ColumnCount + i] = value2;
                     tabInfo.Data[(ClickedRowIndex + 1) * dataGridView.ColumnCount + i] = value1;
                 }
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void MoveRowLower_Click(object sender, EventArgs e)
+        internal static void MoveRowLower_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 for (int i = 0; i < dataGridView.Columns.Count; i++)
@@ -386,16 +397,15 @@ namespace CSV_Redactor
                     tabInfo.Data[(ClickedRowIndex + 1) * dataGridView.ColumnCount + i] = value2;
                     tabInfo.Data[(ClickedRowIndex + 2) * dataGridView.ColumnCount + i] = value1;
                 }
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void AddRowUpper_Click(object sender, EventArgs e)
+        internal static void AddRowUpper_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int selectedRowCount = dataGridView.SelectedRows.Count;
@@ -425,16 +435,15 @@ namespace CSV_Redactor
                 }
 
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void AddRowLower_Click(object sender, EventArgs e)
+        internal static void AddRowLower_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int selectedRowCount = dataGridView.SelectedRows.Count;
@@ -475,16 +484,15 @@ namespace CSV_Redactor
                 }
 
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DuplicateRow_Click(object sender, EventArgs e)
+        internal static void DuplicateRow_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int columnCount = dataGridView.Columns.Count;
@@ -539,16 +547,15 @@ namespace CSV_Redactor
                     }
                 }
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void CopyRow_Click(object sender, EventArgs e)
+        internal static void CopyRow_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int columnCount = dataGridView.Columns.Count;
@@ -586,12 +593,12 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void CutRow_Click(object sender, EventArgs e)
+        internal static void CutRow_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int columnCount = dataGridView.Columns.Count;
@@ -644,16 +651,15 @@ namespace CSV_Redactor
                 }
 
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void InsertRow_Click(object sender, EventArgs e)
+        internal static void InsertRow_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 int insertableRowIndex = dataGridView.Rows[ClickedRowIndex].IsNewRow ? ClickedRowIndex : ClickedRowIndex + 1;
@@ -673,16 +679,15 @@ namespace CSV_Redactor
                     tabInfo.Data.InsertRange((ClickedRowIndex + 1) * dataGridView.ColumnCount, row);
                 }
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void InsertRowToCurrent_Click(object sender, EventArgs e)
+        internal static void InsertRowToCurrent_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 object[] firstRow = new object[dataGridView.ColumnCount];
@@ -712,16 +717,15 @@ namespace CSV_Redactor
                     tabInfo.Data.InsertRange((ClickedRowIndex + 2) * dataGridView.ColumnCount, row);
                 }
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void ClearRow_Click(object sender, EventArgs e)
+        internal static void ClearRow_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
                 int columnCount = dataGridView.Columns.Count;
                 int selectedRowCount = dataGridView.SelectedRows.Count;
@@ -765,12 +769,12 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DeleteRow_Click(object sender, EventArgs e)
+        internal static void DeleteRow_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
                 int columnCount = dataGridView.Columns.Count;
                 int selectedRowCount = dataGridView.SelectedRows.Count;
@@ -810,14 +814,13 @@ namespace CSV_Redactor
                 }
 
                 tabInfo.IsChanged = true;
-                SetStatusBarInfoLabel(tabInfo);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
         #endregion
 
         #region ContextMenuOnTabClick
-        public static void DuplicateTab_Click(object sender, EventArgs e)
+        internal static void DuplicateTab_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -826,23 +829,23 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void RenameTab_Click(object sender, EventArgs e)
+        internal static void RenameTab_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo[ClickedTabNumber];
+                OldTabInfo tabInfo = TabsInfo[ClickedTabNumber];
                 // Переименовать TextBox, DataGridView, Tab
 
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void CloseTab_Click(object sender, EventArgs e)
+        internal static void CloseTab_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                TabInfo tabInfo = TabsInfo[ClickedTabNumber];
+                OldTabInfo tabInfo = TabsInfo[ClickedTabNumber];
                 if (tabInfo.IsChanged)
                 {
                     if (Methods.ShowConfirmationMessage() != DialogResult.Yes) return;
@@ -862,308 +865,65 @@ namespace CSV_Redactor
         #region Program Menu
 
         #region File Program Menu
-        public static void CreateFile_Click(object sender, EventArgs e)
+        internal static void CreateFile_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-                string newFileName = "";
-                if (isDialogAlreadyOpened) return;
-                var dialogResult = ShowCreationNewFileWindow(ref newFileName);
-
-                if (dialogResult != DialogResult.OK) return;
-
-                if (newFileName.Replace(" ", "") == "") newFileName = Methods.GetFieldsFromSettings(SettingsFile, "global-defaultFileName").Value;
-                string extension = Methods.GetFieldsFromSettings(SettingsFile, "global-defaultFileExtension").Value;
-                newFileName = newFileName.Trim() + extension;
-                TabPage newTabPage = CreateNewTabPage(newFileName);
-
-                newTabPage.ImageIndex = 0;
-
-                DataGridView dataGridView = newTabPage.Controls.OfType<DataGridView>().First();
-                RichTextBox textBox = newTabPage.Controls.OfType<RichTextBox>().First();
-
-                TabInfo tabInfo = new(
-                    fullTabName: newTabPage.Name,
-                    shortTabName: newFileName,
-                    extension: extension,
-                    dataGridView: dataGridView,
-                    textBox: textBox
-                    );
-                tabInfo.DataGridView.ColumnCount = tabInfo.ColumnCount == 0 ? 1 : tabInfo.ColumnCount;
-                string[] names = Methods.GenColumnNames(new string[tabInfo.DataGridView.ColumnCount]);
-                for (int i = 0; i < tabInfo.DataGridView.ColumnCount; i++)
-                {
-                    tabInfo.DataGridView.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
-                    tabInfo.Data.Add(names[i]);
-                }
-
-                TabsInfo.Add(tabInfo);
-
-                Files_TabControl.TabPages.Add(newTabPage);
-                Files_TabControl.SelectedIndex = Files_TabControl.TabCount - 1;
-                ColumnCount_TextBox.Text = dataGridView.ColumnCount.ToString();
-
-                if (tabInfo.IsShowAsTable) { Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount); Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells); }
-                else { Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount); tabInfo.IsStretchCells = false; }
-
-                ChangeFormElementsVisibility(true);
-                ChangeProgramMenuAvailability(true, tabInfo);
-                SetStatusBarInfoLabel(tabInfo);
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-            static DialogResult ShowCreationNewFileWindow(ref string inputText)
-            {
-                Methods.TraceCalls(MethodBase.GetCurrentMethod());
-                DialogResult result = DialogResult.Cancel;
-                try
-                {
-                    System.Drawing.Size size = new(165, 75);
-                    Form inputBox = new() { StartPosition = FormStartPosition.CenterParent, Location = new System.Drawing.Point(), MaximizeBox = false, MinimizeBox = false, FormBorderStyle = FormBorderStyle.FixedDialog, ClientSize = size, Text = "Создание" };
-
-                    Label label = new() { AutoSize = true, Size = new(5, 5), Location = new System.Drawing.Point(5, 5), Text = "Введите имя файла:" };
-                    inputBox.Controls.Add(label);
-
-                    TextBox nameTextBox = new() { Size = new(size.Width - 10, 10), Location = new System.Drawing.Point(5, 20), Text = inputText };
-                    inputBox.Controls.Add(nameTextBox);
-
-                    Button addButton = new() { DialogResult = DialogResult.OK, Name = "addButton", Size = new(75, 25), Text = "&Добавить", Location = new System.Drawing.Point(size.Width - 80, 44) };
-                    inputBox.Controls.Add(addButton);
-
-                    Button cancelButton = new() { DialogResult = DialogResult.Cancel, Name = "cancelButton", Size = new(75, 25), Text = "&Отмена", Location = new System.Drawing.Point(size.Width - 80 - 80, 44) };
-                    inputBox.Controls.Add(cancelButton);
-
-                    inputBox.AcceptButton = addButton;
-                    inputBox.CancelButton = cancelButton;
-
-                    isDialogAlreadyOpened = true;
-                    result = inputBox.ShowDialog();
-                    isDialogAlreadyOpened = false;
-                    inputText = nameTextBox.Text;
-                }
-                catch (Exception ex) { Methods.ExceptionProcessing(ex); }
-                return result;
-            }
+            new TextFile().CreateNewTab();
         }
-        public static void OpenFile_Click(object sender, EventArgs e)
+        internal static void OpenFile_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-                OpenFileDialog openFileDialog = new OpenFileDialog
-                {
-                    Title = "Открытие текстового файла",
-                    Filter =
-                    "Text files|*.csv;*.txt|" + // TEXT FILES
-                    "All files|*.*" // ALL FILES
-                };
-                DialogResult result = openFileDialog.ShowDialog();
-                if (result != DialogResult.OK) return;
-                string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
-                switch (extension)
-                {
-                    case ".txt":
-                    case ".csv": TextFileOpened(); return;
-                    default: { MessageBox.Show($"Файл с расширением \"{extension}\" не поддерживается!", "Внимание!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return; }
-                }
-                void TextFileOpened()
-                {
-                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
-
-                    string fileName = openFileDialog.SafeFileName;
-                    TabPage newTabPage = CreateNewTabPage(fileName);
-
-                    newTabPage.ImageIndex = 0;
-
-                    DataGridView dataGridView = newTabPage.Controls.OfType<DataGridView>().First();
-                    RichTextBox textBox = newTabPage.Controls.OfType<RichTextBox>().First();
-
-                    TabInfo tabInfo = new(
-                    fullTabName: newTabPage.Name,
-                    shortTabName: fileName,
-                    extension: extension,
-                    dataGridView: dataGridView,
-                    textBox: textBox
-                    );
-                    tabInfo.IsFileOpened = true;
-                    tabInfo.FilePath = openFileDialog.FileName;
-                    TabsInfo.Add(tabInfo);
-
-                    Files_TabControl.TabPages.Add(newTabPage);
-                    Files_TabControl.SelectedIndex = Files_TabControl.TabCount - 1;
-
-                    if (tabInfo.IsShowAsTable)
-                    {
-                        tabInfo.Data = Methods.ReadData(File.ReadAllText(openFileDialog.FileName, Encoding.Default));
-                        Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
-                        Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
-                    }
-                    else { tabInfo.TextBox.Text = File.ReadAllText(openFileDialog.FileName, Encoding.Default); tabInfo.IsStretchCells = false; }
-
-                    ChangeFormElementsVisibility(true);
-                    ChangeProgramMenuAvailability(true, tabInfo);
-                    SetStatusBarInfoLabel(tabInfo);
-                }
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            new OpenedTextFile().CreateNewTab();
         }
-        public static void SaveFile_Click(object sender, EventArgs e)
+        internal static void SaveFile_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            IFile result = (IFile)Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+            result.Save();
+            ((IDefaultFieldsOfTabs)result).IsChanged = false;
         }
-        public static void SaveFileAs_Click(object sender, EventArgs e)
+        internal static void SaveFileAs_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
         #endregion
 
         #region DataBase Program Menu
-        public static void OpenDataBase_Click(object sender, EventArgs e)
+        internal static void OpenDataBase_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-                OpenFileDialog openFileDialog = new OpenFileDialog
-                {
-                    Title = "Открытие базы данных",
-                    Filter =
-                    "SQL Server|*.mdf|" +
-                    "SQLite|*.sqlite;*.sqlite3;*.db;*.db3;*.s3db;*.sl3|" +
-                    "MySQL|*.myd|" +
-                    "All files|*.*"
-                };
-                DialogResult result = openFileDialog.ShowDialog();
-                if (result != DialogResult.OK) return;
-                string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
-                switch (extension)
-                {
-                    case ".mdf": SQLServerOpened(); return;
-                    case ".sqlite":
-                    case ".sqlite3":
-                    case ".db":
-                    case ".db3":
-                    case ".s3db":
-                    case ".sl3": SQLiteOpened(); return;
-                    case ".myd": MySQLOpened(); return;
-                    default: { MessageBox.Show($"База данных с расширением \"{extension}\" не поддерживается!", "Внимание!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return; }
-                }
-                void SQLServerOpened()
-                {
-                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
-                }
-                void SQLiteOpened()
-                {
-                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
-                }
-                void MySQLOpened()
-                {
-                    Methods.TraceCalls(MethodBase.GetCurrentMethod());
-                }
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            DataBase.CreateDataBaseTab();
         }
         #endregion
 
         #region Edit Program Menu
-        public static void Refresh_Click(object sender, EventArgs e)
+        internal static void Refresh_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-
-                if (!File.Exists(tabInfo.FilePath))
-                { 
-                    MessageBox.Show("Не удалось выполнить считывание!\nФайл не доступен или не существует!", "Возникла ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error); 
-                    return; 
-                }
-
-                if (tabInfo.IsDataBase)
-                {
-                    // Обновить список таблиц
-                    // Если таблица пропала из списка таблиц, то спросить, закрыть ли таблицу или оставить текущую копию 
-                    // Иначе обновить таблицу
-                }
-                else
-                {
-                    if (tabInfo.IsShowAsTable)
-                    {
-                        tabInfo.Data = Methods.ReadData(File.ReadAllText(tabInfo.FilePath, Encoding.Default));
-                        Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
-                        Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
-                    }
-                    else 
-                    { 
-                        tabInfo.TextBox.Text = File.ReadAllText(tabInfo.FilePath, Encoding.Default); 
-                        tabInfo.IsStretchCells = false;
-                        ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
-                        ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = false;
-                    }
-                }
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            ((IFile)Tab.FindCurrentTabClass(Tab.Main_TabControl, true)).LoadData();
         }
-        public static void Clear_Click(object sender, EventArgs e)
+        internal static void Clear_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-
-                if (tabInfo.IsDataBase)
-                {
-                    // Очистить содержимое выбранной таблицы
-                }
-                else
-                {
-                    if (tabInfo.IsShowAsTable)
-                    {
-                        tabInfo.DataGridView.Rows.Clear();
-                        Methods.ChangeStretchDataGridView(tabInfo.DataGridView, false);
-                    }
-                    else 
-                    { 
-                        tabInfo.TextBox.Text = tabInfo.TextBox.Lines[0]; 
-                    }
-                }
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            ((IDefaultFieldsOfTabs)Tab.FindCurrentTabClass(Tab.Main_TabControl, true)).Clear();
         }
         #endregion
 
         #region View Program Menu
-        public static void ShowStatusBar_Click(object sender, EventArgs e)
+        internal static void ShowStatusBar_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
-            try
-            {
-                ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
-
-                Files_TabControl.Height = menuItem.Checked ? Files_TabControl.Height -= 25 : Files_TabControl.Height + 25;
-
-                StatusBar_ToolStrip.Visible = menuItem.Checked;
-            }
-            catch (Exception ex) { Methods.ExceptionProcessing(ex); }
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            Files_TabControl.Height = menuItem.Checked ? Files_TabControl.Height -= 25 : Files_TabControl.Height + 25;
+            StatusBar_ToolStrip.Visible = menuItem.Checked;
         }
-        public static void HideEmptyRows_Click(object sender, EventArgs e)
+        internal static void HideEmptyRows_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
                 if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
 
                 tabInfo.IsHideEmptyRows = (sender as ToolStripMenuItem).Checked;
 
@@ -1172,13 +932,13 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void ShowAsTable_Click(object sender, EventArgs e)
+        internal static void ShowAsTable_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
                 if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
 
                 QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
                 QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
@@ -1209,35 +969,41 @@ namespace CSV_Redactor
                 tabInfo.DataGridView.Visible = tabInfo.IsShowAsTable;
                 tabInfo.TextBox.Visible = !tabInfo.IsShowAsTable;
 
-                Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
+                //Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void StretchCells_Click(object sender, EventArgs e)
+        internal static void StretchCells_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-
-                tabInfo.IsStretchCells = (sender as ToolStripMenuItem).Checked;
-
-                if (!tabInfo.IsShowAsTable)
-                {
-                    tabInfo.Data = Methods.ReadData(tabInfo.TextBox.Text);
-                    Methods.WriteData(tabInfo.TextBox, tabInfo.Data, tabInfo.ColumnCount);
-                }
-                else Methods.ChangeStretchDataGridView(tabInfo.DataGridView, tabInfo.IsStretchCells);
+                //var tab = TabInfo.FindClassOfCurrentTab(Files_TabControl);
+                //if (tab is DataBase dataBase)
+                //{
+                //    var table = TabInfo.FindClassOfCurrentTab(dataBase.Tables_TabControl) as DataBaseTable;
+                //    table.IsStretchCells = (sender as ToolStripMenuItem).Checked;
+                //}
+                //else
+                //{
+                //    var file = tab as TextFile;
+                //    file.IsStretchCells = (sender as ToolStripMenuItem).Checked;
+                //}
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
         #endregion
 
         #region Settings
-        public static void ShowSettings_Click(object sender, EventArgs e)
+        internal static void ShowSettings_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
+
+            System.Windows.Window settingWindow = new SettingsWindow();
+            ElementHost.EnableModelessKeyboardInterop(settingWindow);
+            new WindowInteropHelper(settingWindow).Owner = MainForm_Form.Handle;
+            settingWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            settingWindow.ShowDialog();
         }
         #endregion
 
@@ -1247,7 +1013,7 @@ namespace CSV_Redactor
         #region Default Form Components
 
         #region Button
-        public static void IncreaseButton_Click(object sender, EventArgs e)
+        internal static void IncreaseButton_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -1259,7 +1025,7 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void DecreaseButton_Click(object sender, EventArgs e)
+        internal static void DecreaseButton_Click(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
@@ -1275,12 +1041,13 @@ namespace CSV_Redactor
         #endregion
 
         #region TextBox
-        public static void ColumnCountBox_TextChanged(object sender, EventArgs e)
+        internal static void ColumnCountBox_TextChanged(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
+            return;
             try
             {
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
+                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
                 DataGridView dataGridView = tabInfo.DataGridView;
 
                 if (!int.TryParse(ColumnCount_TextBox.Text, out int newColumnCount) || newColumnCount <= 0)
@@ -1295,7 +1062,7 @@ namespace CSV_Redactor
 
                 if (newColumnCount == tabInfo.ColumnCount)
                 {
-                    SetStatusBarInfoLabel(tabInfo);
+                    //SetStatusBarInfoLabel(tabInfo);
                     return;
                 }
 
@@ -1312,7 +1079,7 @@ namespace CSV_Redactor
                     {
                         names[i] = dataGridView.Columns[i].HeaderText;
                     }
-                    names = Methods.GenColumnNames(names);
+                    //names = Methods.GenColumnNames(names);
                     // ДОБАВЛЕНИЕ ИМЕН
                     for (int i = 0; i < tabInfo.DataGridView.ColumnCount; i++)
                     {
@@ -1388,35 +1155,21 @@ namespace CSV_Redactor
         #endregion
 
         #region TabControl
-        public static void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        internal static void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
             try
             {
-                if (Files_TabControl.SelectedIndex == -1 || Files_TabControl.SelectedTab == null) return;
-                TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                ColumnCount_TextBox.Text = tabInfo.ColumnCount.ToString();
-
-                ToolStripItemCollection itemsInView = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["view"]).DropDown.Items;
-                ((ToolStripMenuItem)itemsInView["hideEmptyRows"]).Checked = tabInfo.IsHideEmptyRows;
-                ((ToolStripMenuItem)itemsInView["showAsTable"]).Checked = tabInfo.IsShowAsTable;
-                ((ToolStripMenuItem)itemsInView["stretchCells"]).Checked = tabInfo.IsStretchCells;
-
-                ToolStripItemCollection itemsInEdit = ((ToolStripMenuItem)ProgramMenu_MenuStrip.Items["edit"]).DropDown.Items;
-                ((ToolStripMenuItem)itemsInEdit["refresh"]).Enabled = tabInfo.IsFileOpened;
-                ((ToolStripMenuItem)itemsInEdit["clear"]).Enabled = true;
-
-                QickActionsMenu_ToolStrip.Items["increaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = tabInfo.IsShowAsTable;
-                QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Enabled = tabInfo.IsShowAsTable;
-
-                ChangeProgramMenuAvailability(true, tabInfo);
-
-                SetStatusBarInfoLabel(tabInfo);
+                var result = Tab.FindCurrentTabClass(sender, true);
+                if (result != null)
+                {
+                    Tab.ChangeProgramMenuAvailability((IDefaultFieldsOfTabs)result);
+                }
+                else Tab.ChangeProgramMenuAvailability();
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void TabControl_MouseLeave(object sender, EventArgs e)
+        internal static void TabControl_MouseLeave(object sender, EventArgs e)
         {
             try
             {
@@ -1424,22 +1177,32 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void TabControl_MouseMove(object sender, MouseEventArgs e)
+        internal static void TabControl_MouseMove(object sender, MouseEventArgs e)
         {
             try
             {
-                if (Files_TabControl.TabCount == 0) return;
+                TabControl control = (TabControl)sender;
+                if (control.TabPages.Count == 0) return;
 
-                for (int i = 0; i < Files_TabControl.TabCount; i++)
+                for (int i = 0; i < control.TabCount; i++)
                 {
-                    System.Drawing.Rectangle tabRectangle = Files_TabControl.GetTabRect(i);
+                    System.Drawing.Rectangle tabRectangle = control.GetTabRect(i);
                     if (tabRectangle.Contains(new System.Drawing.Point(e.X, e.Y)))
                     {
                         if (MainForm_Form.Controls.Contains(CloseTabButton))
                             MainForm_Form.Controls.Remove(CloseTabButton);
+                        int additionalHeight = 0,
+                            additionalWidth = 0;
+                        if (control.Name != "Files_TabControl")
+                        {
+                            ITab tab = Tab.FindClassOfCurrentTab(control, true);
+                            DataBase dataBase = ((DataBaseTable)tab).DataBase;
 
-                        CloseTabButton.Location = new System.Drawing.Point(tabRectangle.Right - 14, 53);
-                        CloseTabButton.Name = Files_TabControl.TabPages[i].Name;
+                            additionalHeight = 24;
+                            additionalWidth = dataBase.SplitContainer.Panel1.Width + dataBase.SplitContainer.SplitterWidth;
+                        }
+                        CloseTabButton.Location = new System.Drawing.Point(tabRectangle.Right - 14 + additionalWidth, 53 + additionalHeight);
+                        CloseTabButton.Name = control.TabPages[i].Name;
 
                         MainForm_Form.Controls.Add(CloseTabButton);
                         CloseTabButton.BringToFront();
@@ -1449,20 +1212,23 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-        public static void TabControl_MouseDown(object sender, MouseEventArgs e)
+        internal static void TabControl_MouseDown(object sender, MouseEventArgs e)
         {
+            TabControl control = (TabControl)sender;
+            if (control.TabPages.Count == 0) return;
+
             try
             {
                 int distBeforeTab = 0;
-                for (int i = 0; i < Files_TabControl.TabPages.Count; i++)
+
+                for (int i = 0; i < control.TabPages.Count; i++)
                 {
-                    System.Drawing.Rectangle tabRectangle = Files_TabControl.GetTabRect(i);
+                    System.Drawing.Rectangle tabRectangle = control.GetTabRect(i);
                     System.Drawing.Rectangle closeButtonRectangle = new(tabRectangle.Right - 15, tabRectangle.Top + 4, 9, 7);
                     if (e.Button == MouseButtons.Left)
                     {
                         if (closeButtonRectangle.Contains(e.Location))
                         {
-                            ClickedTabNumber = i;
                             closeTab();
                             break;
                         }
@@ -1473,21 +1239,18 @@ namespace CSV_Redactor
                         {
                             if (e.Button == MouseButtons.Middle)
                             {
-                                ClickedTabNumber = i;
                                 closeTab();
                                 break;
                             }
                             else if (e.Button == MouseButtons.Right)
                             {
-                                if (MainForm_Form.Controls.Contains(CloseTabButton)) MainForm_Form.Controls.Remove(CloseTabButton);
-                                ClickedTabNumber = i;
+                                if (control.Controls.Contains(CloseTabButton)) control.Controls.Remove(CloseTabButton);
                                 showActionsMenu(tabRectangle, distBeforeTab);
                                 break;
                             }
                         }
                     }
                     distBeforeTab += tabRectangle.Width;
-
                 }
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
@@ -1497,7 +1260,8 @@ namespace CSV_Redactor
                 Methods.TraceCalls(MethodBase.GetCurrentMethod());
                 try
                 {
-                    TabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.TabPages[ClickedTabNumber].Name);
+                    var tabPage = Tab.FindClassOfCurrentTab(control, true);
+
                     int x = Cursor.Position.X - e.X + dist,
                         y = Cursor.Position.Y - e.Y + tabRectangle.Height + 3;
                     ContextMenuOnTabClick.Show(new System.Drawing.Point(x, y));
@@ -1509,15 +1273,37 @@ namespace CSV_Redactor
                 Methods.TraceCalls(MethodBase.GetCurrentMethod());
                 try
                 {
-                    TabInfo tabInfo = TabsInfo[ClickedTabNumber];
-                    if (tabInfo.IsChanged)
+                    var tabPage = Tab.FindClassOfCurrentTab(control, false);
+                    bool isShowConfirmation = false;
+                    if (tabPage is IDefaultFieldsOfTabs tabInfo && tabInfo.IsChanged)
                     {
-                        if (Methods.ShowConfirmationMessage() != DialogResult.Yes) return;
+                        isShowConfirmation = true;
                     }
-                    TabsInfo.RemoveAt(ClickedTabNumber);
-                    if (MainForm_Form.Controls.Contains(CloseTabButton)) MainForm_Form.Controls.Remove(CloseTabButton);
-                    Files_TabControl.TabPages.RemoveAt(ClickedTabNumber);
-                    if (Files_TabControl.TabPages.Count == 0) { ChangeFormElementsVisibility(false); ChangeProgramMenuAvailability(false); }
+                    else if (tabPage is DataBase dataBase)
+                    {
+                        foreach (var tab in dataBase.Tabs)
+                        {
+                            if (((IDefaultFieldsOfTabs)tab).IsChanged)
+                            {
+                                isShowConfirmation = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isShowConfirmation)
+                        if (Methods.ShowConfirmationMessage() != DialogResult.Yes) return;
+
+                    Tab.Tabs.Remove(tabPage);
+                    if (tabPage is DataBaseTable table)
+                        table.DataBase.Tabs.Remove(tabPage);
+                    if (Tab.MainForm_Form.Controls.Contains(CloseTabButton))
+                        Tab.MainForm_Form.Controls.Remove(CloseTabButton);
+                    control.TabPages.Remove(tabPage.TabPage);
+                    if (control.Name == "Files_TabControl" && control.TabPages.Count == 0)
+                    {
+                        Tab.ChangeFormElementsVisibility(false);
+                        Tab.ChangeProgramMenuAvailability();
+                    }
                 }
                 catch (Exception ex) { Methods.ExceptionProcessing(ex); }
             }
@@ -1525,15 +1311,15 @@ namespace CSV_Redactor
         #endregion
 
         #region Form
-        public static void Form_FormClosing(object sender, FormClosingEventArgs e)
+        internal static void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             try
             {
                 if (TabsInfo.Count == 0) return;
-                List<TabInfo> fileNames = new();
+                List<OldTabInfo> fileNames = new();
 
-                foreach (TabInfo tab in TabsInfo)
+                foreach (OldTabInfo tab in TabsInfo)
                 {
                     if (tab.IsChanged) fileNames.Add(tab);
                 }
@@ -1553,7 +1339,7 @@ namespace CSV_Redactor
                 {
                     message += $"ах:";
                     int index = 0;
-                    foreach (TabInfo tab in fileNames)
+                    foreach (OldTabInfo tab in fileNames)
                     {
                         message +=
                             "\n   \"" +
@@ -1569,7 +1355,6 @@ namespace CSV_Redactor
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
-
         #endregion
 
         #endregion
