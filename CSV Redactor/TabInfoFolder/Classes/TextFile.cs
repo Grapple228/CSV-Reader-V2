@@ -117,7 +117,10 @@ namespace CSV_Redactor.TabInfoFolder.Classes
         public void Clear()
         {
             if (IsShowAsTable)
+            {
                 DataGridView.Rows.Clear();
+                Data = ReadData();
+            }
             else TextBox.Text = TextBox.Lines[0];
         }
         public void SaveFileAs(string fileName = null)
@@ -159,12 +162,13 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                 string[] names = new string[DataGridView.ColumnCount];
                 for (int i = 0; i < DataGridView.ColumnCount; i++)
                     names[i] = DataGridView.Columns[i].HeaderText.Trim();
+                data.InsertRange(0, names);
 
                 for (int i = 0; i < DataGridView.RowCount; i++)
                 {
                     if (DataGridView.Rows[i].IsNewRow) break;
                     for (int j = 0; j < ColumnCount; j++)
-                        data.Add(DataGridView.Rows[i].Cells[j].Value.ToString());
+                        data.Add("" + DataGridView.Rows[i].Cells[j].Value);
                 }
                 RowCount = DataGridView.RowCount - 1;
 
@@ -421,7 +425,6 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             Data = ReadData();
             WriteData(FilePath);
         }
-
         public override void CreateNewTab()
         {
             OpenFileDialog ofd = new()

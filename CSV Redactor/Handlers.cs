@@ -1,12 +1,12 @@
-﻿using System;
+﻿using CSV_Redactor.Forms;
+using CSV_Redactor.TabInfoFolder.Classes;
+using CSV_Redactor.TabInfoFolder.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Interop;
-using CSV_Redactor.Forms;
-using CSV_Redactor.TabInfoFolder.Classes;
-using CSV_Redactor.TabInfoFolder.Interfaces;
 using static CSV_Redactor.Main_Form;
 using static CSV_Redactor.Main_Form.OldTabInfo;
 
@@ -81,21 +81,21 @@ namespace CSV_Redactor
         }
         internal static void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            return;
             try
             {
-                //OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                //DataGridView dataGridView = tabInfo.DataGridView;
-                //int neededCount = (e.RowIndex + 2) * dataGridView.ColumnCount;
-                //if (tabInfo.Data.Count < neededCount)
-                //{
-                //    int difference = neededCount - tabInfo.Data.Count;
-                //    tabInfo.Data.InsertRange(neededCount - difference, new object[difference]);
-                //}
+                ITab tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+                IDefaultFieldsOfTabs tabInfo = (IDefaultFieldsOfTabs)tab;
+                int columnCount = tabInfo.DataGridView.ColumnCount;
+                int neededCount = (e.RowIndex + 2) * columnCount;
+                if (tabInfo.Data.Count < neededCount)
+                {
+                    int difference = neededCount - tabInfo.Data.Count;
+                    tabInfo.Data.InsertRange(neededCount - difference, new string[difference]);
+                }
 
-                //tabInfo.Data[(e.RowIndex + 1) * dataGridView.ColumnCount + e.ColumnIndex] = dataGridView[e.ColumnIndex, e.RowIndex].Value;
+                tabInfo.Data[(e.RowIndex + 1) * columnCount + e.ColumnIndex] = "" + tabInfo.DataGridView[e.ColumnIndex, e.RowIndex].Value;
 
-                //tabInfo.IsChanged = true;
+                tabInfo.IsChanged = true;
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }
@@ -875,7 +875,7 @@ namespace CSV_Redactor
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod());
             var tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
-            
+
             IDefaultFieldsOfTabs result = (IDefaultFieldsOfTabs)tab;
             result.SaveFileAs(tab.PartialName);
         }
@@ -938,8 +938,7 @@ namespace CSV_Redactor
                 QickActionsMenu_ToolStrip.Items["decreaseColumnCount_Button"].Visible = !tabInfo.IsShowAsTable;
                 QickActionsMenu_ToolStrip.Items["columnCountBox_TextBox"].Visible = !tabInfo.IsShowAsTable;
 
-                if (!tabInfo.IsShowAsTable)
-                    tabInfo.Data = tabInfo.ReadData();
+                tabInfo.Data = tabInfo.ReadData();
 
                 tabInfo.IsShowAsTable = (sender as ToolStripMenuItem).Checked;
 
@@ -956,7 +955,7 @@ namespace CSV_Redactor
                 }
                 else
                 {
-                    tabInfo.DataGridView.Rows.Clear();             
+                    tabInfo.DataGridView.Rows.Clear();
                 }
 
                 tabInfo.DataGridView.Visible = tabInfo.IsShowAsTable;
@@ -1050,7 +1049,7 @@ namespace CSV_Redactor
                     return;
                 }
 
-                if(newColumnCount == tabInfo.ColumnCount || !tabInfo.IsShowAsTable) return;
+                if (newColumnCount == tabInfo.ColumnCount || !tabInfo.IsShowAsTable) return;
 
                 // Обработка заголовков таблицы
                 int differense = Math.Abs(tabInfo.ColumnCount - newColumnCount);
