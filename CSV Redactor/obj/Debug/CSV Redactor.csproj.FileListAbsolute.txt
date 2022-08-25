@@ -43,3 +43,26 @@ C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\Te
 C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\bin\Debug\System.Data.SqlClient.dll
 C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\bin\Debug\System.Data.SqlClient.xml
 C:\Users\green\source\repos\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.CopyComplete
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\bin\Debug\CSV Redactor.exe.config
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\bin\Debug\CSV Redactor.exe
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\bin\Debug\CSV Redactor.pdb
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\bin\Debug\System.Data.SqlClient.dll
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\bin\Debug\System.Data.SqlClient.xml
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.AssemblyReference.cache
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.SuggestedBindingRedirects.cache
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\ButtonTheme.baml
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\MenuButtonTheme.baml
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\Themes\TextBoxTheme.baml
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\SettingsWindow.g.cs
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor_Content.g.cs
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor_MarkupCompile.cache
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor_MarkupCompile.lref
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\Forms\SettingsWindow.baml
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.g.resources
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV_Redactor.Main_Form.resources
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV_Redactor.Properties.Resources.resources
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.GenerateResource.cache
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.CoreCompileInputs.cache
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.csproj.CopyComplete
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.exe
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\CSV Redactor.pdb

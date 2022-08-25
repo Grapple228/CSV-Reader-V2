@@ -1036,11 +1036,11 @@ namespace CSV_Redactor
         internal static void ColumnCountBox_TextChanged(object sender, EventArgs e)
         {
             Methods.TraceCalls(MethodBase.GetCurrentMethod(), new object[] { sender });
-            return;
             try
             {
-                OldTabInfo tabInfo = TabsInfo.Find(tab => tab.FullTabName == Files_TabControl.SelectedTab.Name);
-                DataGridView dataGridView = tabInfo.DataGridView;
+                ITab tab = Tab.FindCurrentTabClass(Tab.Main_TabControl, true);
+                if (tab == null) return;
+                IDefaultFieldsOfTabs tabInfo = (IDefaultFieldsOfTabs)tab;
 
                 if (!int.TryParse(ColumnCount_TextBox.Text, out int newColumnCount) || newColumnCount <= 0)
                 {
@@ -1050,14 +1050,7 @@ namespace CSV_Redactor
                     return;
                 }
 
-                if (!tabInfo.IsShowAsTable) return;
-
-                if (newColumnCount == tabInfo.ColumnCount)
-                {
-                    //SetStatusBarInfoLabel(tabInfo);
-                    return;
-                }
-
+                if(newColumnCount == tabInfo.ColumnCount || !tabInfo.IsShowAsTable) return;
 
                 // Обработка заголовков таблицы
                 int differense = Math.Abs(tabInfo.ColumnCount - newColumnCount);
@@ -1066,12 +1059,12 @@ namespace CSV_Redactor
                 if (newColumnCount > tabInfo.ColumnCount)
                 {
                     // ГЕНЕРАЦИЯ ИМЕН
-                    string[] names = new string[tabInfo.DataGridView.ColumnCount];
-                    for (int i = 0; i < names.Length; i++)
+                    string[] names = new string[newColumnCount];
+                    for (int i = 0; i < tabInfo.ColumnCount; i++)
                     {
-                        names[i] = dataGridView.Columns[i].HeaderText;
+                        names[i] = tabInfo.Data[i];
                     }
-                    //names = Methods.GenColumnNames(names);
+                    names = Tab.GenColumnNames(names);
                     // ДОБАВЛЕНИЕ ИМЕН
                     for (int i = 0; i < tabInfo.DataGridView.ColumnCount; i++)
                     {
@@ -1090,57 +1083,8 @@ namespace CSV_Redactor
                         tabInfo.Data.RemoveAt(columnNumber);
                     }
                 }
-
-                // Добавление пустых значений в последнюю строку данных
-                int dataNeedToAdd = tabInfo.DataGridView.ColumnCount - tabInfo.Data.Count % tabInfo.DataGridView.ColumnCount;
-                for (int i = 0; i < dataNeedToAdd; i++)
-                    tabInfo.Data.Add(null);
-
-                tabInfo.ColumnCount = tabInfo.DataGridView.ColumnCount;
-
-                if (tabInfo.Data.Count - tabInfo.ColumnCount != 0)
-                {
-                    // Удаление пустых строк в конце данных
-                    bool isBreak = false;
-                    int count = tabInfo.Data.Count - tabInfo.ColumnCount;
-                    int rowCount = count / tabInfo.ColumnCount;
-                    if (count % tabInfo.ColumnCount != 0) rowCount++;
-
-                    for (int i = rowCount; i > -1; i--)
-                    {
-                        int maxValue = count % tabInfo.ColumnCount == 0 ?
-                            tabInfo.ColumnCount :
-                            tabInfo.ColumnCount - count % tabInfo.ColumnCount;
-
-                        for (int j = 0; j < maxValue; j++)
-                        {
-                            string cell = "" + tabInfo.Data[i * tabInfo.ColumnCount + j];
-                            if (cell.Trim().Replace(" ", "").Replace("\u00A0", "") == "") continue;
-                            else { isBreak = true; break; }
-                        }
-                        if (isBreak) break;
-
-                        tabInfo.Data.RemoveRange(i * tabInfo.ColumnCount, maxValue);
-                    }
-                }
-
-
-                // Обработка поведения таблицы в зависимости от состояния фиксации
-                if (tabInfo.IsFixed) // Если зафиксировано
-                {
-
-                }
-                else // Если не зафиксировано
-                {
-                    tabInfo.FixedColumnCount = tabInfo.ColumnCount;
-                    ColumnCount_TextBox.Text = tabInfo.ColumnCount.ToString();
-                    Methods.WriteData(tabInfo.DataGridView, tabInfo.Data, tabInfo.ColumnCount);
-                }
-
-                foreach (DataGridViewColumn column in dataGridView.Columns)
-                {
-                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
-                }
+                tabInfo.ColumnCount = newColumnCount;
+                tabInfo.WriteData();
             }
             catch (Exception ex) { Methods.ExceptionProcessing(ex); }
         }

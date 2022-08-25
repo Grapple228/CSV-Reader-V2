@@ -4,11 +4,11 @@
 winexe
 C#
 .cs
-D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Debug\
+D:\GIT\Grapple228\CSV-Reader-V2\CSV Redactor\obj\Release\
 CSV_Redactor
 none
 false
-DEBUG;TRACE
+TRACE
 
 41126563145
 1800373620
@@ -16,5 +16,5 @@ DEBUG;TRACE
 17529064746
 Forms\SettingsWindow.xaml;Forms\Themes\ButtonTheme.xaml;Forms\Themes\MenuButtonTheme.xaml;Forms\Themes\TextBoxTheme.xaml;
 
-False
+True
 

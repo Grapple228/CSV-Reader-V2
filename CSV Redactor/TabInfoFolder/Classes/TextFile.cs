@@ -377,9 +377,11 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                 foreach (DataGridViewColumn column in DataGridView.Columns)
                     column.SortMode = DataGridViewColumnSortMode.NotSortable;
 
+                Tab.ChangeStretchDataGridView(DataGridView, IsStretchCells);
+
                 void AddWithEmptyRows()
                 {
-                    for (int i = 0; i < RowCount; i++)
+                    for (int i = 1; i < RowCount; i++)
                     {
                         DataGridView.Rows.Add(arrays[i]);
                     }
@@ -387,7 +389,7 @@ namespace CSV_Redactor.TabInfoFolder.Classes
                 void AddWithoutEmptyRows()
                 {
                     int hiddenRows = 0;
-                    for (int i = 0; i < RowCount; i++)
+                    for (int i = 1; i < RowCount; i++)
                     {
                         bool isSkip = false;
                         for(int j = 0; j<ColumnCount; j++)
@@ -457,9 +459,11 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             TabPage.Controls.Add(DataGridView);
             TabPage.Controls.Add(TextBox);
 
+            LoadData();
+
             if (IsShowAsTable)
             {
-                LoadData();
+                
                 DataGridView.Visible = true;
                 int counter = 0;
                 foreach (DataGridViewColumn column in DataGridView.Columns)
@@ -473,7 +477,6 @@ namespace CSV_Redactor.TabInfoFolder.Classes
             else
             {
                 TextBox.Visible = true;
-                LoadData();
                 RowCount = TextBox.Lines.Length;
             }
             Tab.Main_TabControl.TabPages.Add(TabPage);
